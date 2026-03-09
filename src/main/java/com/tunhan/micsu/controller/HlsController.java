@@ -1,0 +1,62 @@
+package com.tunhan.micsu.controller;
+
+import com.tunhan.micsu.dto.request.SongUploadRequest;
+import com.tunhan.micsu.service.hls.HlsService;
+import com.tunhan.micsu.utils.HlsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import com.tunhan.micsu.dto.response.ApiResponse;
+
+@RestController
+@RequestMapping("/api")
+public class HlsController {
+
+    private final HlsService hlsServiceV1;
+    private final HlsService hlsServiceV2;
+    private final HlsService hlsServiceV3;
+
+    @Autowired
+    public HlsController(@Qualifier("hlsServiceV1") HlsService hlsServiceV1,
+            @Qualifier("hlsServiceV2") HlsService hlsServiceV2,
+            @Qualifier("hlsServiceV3") HlsService hlsServiceV3) {
+        this.hlsServiceV1 = hlsServiceV1;
+        this.hlsServiceV2 = hlsServiceV2;
+        this.hlsServiceV3 = hlsServiceV3;
+    }
+
+    @PostMapping("/v1/hls")
+    public ResponseEntity<ApiResponse<Void>> processHlsV1(@ModelAttribute SongUploadRequest request) throws Exception {
+        processWithHls(hlsServiceV1, request, "testId001");
+        return ResponseEntity.ok(ApiResponse.success("Process HLS V1 thành công", null));
+    }
+
+    @PostMapping("/v2/hls")
+    public ResponseEntity<ApiResponse<Void>> processHlsV2(@ModelAttribute SongUploadRequest request) throws Exception {
+        processWithHls(hlsServiceV2, request, "testId002");
+        return ResponseEntity.ok(ApiResponse.success("Process HLS V2 thành công", null));
+    }
+
+    @PostMapping("/v3/hls")
+    public ResponseEntity<ApiResponse<Void>> processHlsV3(@ModelAttribute SongUploadRequest request) throws Exception {
+        processWithHls(hlsServiceV3, request, "testId003");
+        return ResponseEntity.ok(ApiResponse.success("Process HLS V3 thành công", null));
+    }
+
+    private void processWithHls(HlsService service, SongUploadRequest request, String songId) throws IOException {
+        HlsUtil.checkInputMp3(request.getAudioFile());
+        Path tempMp3 = Files.createTempFile("hls_test_", ".mp3");
+        try {
+            request.getAudioFile().transferTo(tempMp3);
+            service.processHls(tempMp3, songId);
+        } finally {
+            Files.deleteIfExists(tempMp3);
+        }
+    }
+}
