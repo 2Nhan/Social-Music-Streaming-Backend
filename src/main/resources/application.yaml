@@ -5,6 +5,11 @@ spring:
     url: "jdbc:mysql://localhost:3306/music_player"
     username: root
     password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
   config:
     import: optional:file:.env[.properties]
   jpa:
@@ -13,8 +18,8 @@ spring:
     show-sql: false
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 200MB
+      max-request-size: 200MB
 server:
   port: 8081
   servlet:
@@ -28,3 +33,7 @@ storage:
     endpoint: https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
     iBucket: image-bucket
     publicDomain: https://crmsoft.site
+jwt:
+  secret: ${JWT_SECRET:micsu-super-secret-key-at-least-256-bits-long-for-hs256-algorithm}
+  expiration: 900000        # 15 minutes — access token TTL (ms)
+  refresh-expiration-days: 30  # 30 days  — refresh token TTL
