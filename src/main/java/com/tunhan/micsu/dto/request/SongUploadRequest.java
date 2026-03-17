@@ -1,5 +1,6 @@
 package com.tunhan.micsu.dto.request;
 
+import com.tunhan.micsu.entity.enums.Visibility;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,4 +21,10 @@ public class SongUploadRequest {
 
     @NotNull
     private MultipartFile audioFile;
+
+    /** Set programmatically from JWT — not from client body */
+    private String uploadedBy;
+
+    /** Default PUBLIC if not specified */
+    private Visibility visibility;
 }

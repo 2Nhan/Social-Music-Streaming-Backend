@@ -44,9 +44,6 @@ public class R2StorageService {
     @Value("${storage.r2.mBucket}")
     private String mBucket;
 
-    @Value("${storage.r2.iBucket}")
-    private String iBucket;
-
     @Value("${storage.r2.publicDomain}")
     private String publicDomain;
 
@@ -54,11 +51,34 @@ public class R2StorageService {
         return mBucket;
     }
 
-    public String getIBucket() {
-        return iBucket;
+    public String getPublicDomain() {
+        return publicDomain;
     }
 
-    public CompletableFuture<String> uploadCoverAsync(MultipartFile file) throws IOException {
+    public String uploadNormalAudio(MultipartFile file, String id) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        String extension = ".mp3";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String uniqueFileName = UUID.randomUUID().toString() + extension;
+        String key = "test/" + id + "/" + songAssets + "/" + uniqueFileName;
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(mBucket)
+                .key(key)
+                .contentType(file.getContentType() != null ? file.getContentType() : "audio/mpeg")
+                .build();
+
+        byte[] fileBytes = file.getBytes();
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
+
+        log.info("[R2StorageService] Normal audio uploaded successfully: {}", key);
+        return publicDomain + "/" + key;
+    }
+
+    public CompletableFuture<String> uploadCoverAsync(MultipartFile file, String id) throws IOException {
         this.checkImageInput(file);
 
         String originalFilename = file.getOriginalFilename();
@@ -68,10 +88,10 @@ public class R2StorageService {
         }
 
         String uniqueFileName = UUID.randomUUID().toString() + extension;
-        String key = "songs/" + coverAssets + "/" + uniqueFileName;
+        String key = "songs/" + id + "/" + coverAssets + "/" + uniqueFileName;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(iBucket)
+                .bucket(mBucket)
                 .key(key)
                 .contentType(file.getContentType())
                 .build();
@@ -82,24 +102,24 @@ public class R2StorageService {
         return s3AsyncClient.putObject(putObjectRequest, requestBody)
                 .handle((res, ex) -> {
                     if (ex != null) {
-                        log.error("[R2StorageService] Upload ảnh bìa thất bại: {}", ex.getMessage());
-                        throw new RuntimeException("Tải lên ảnh bìa thất bại: " + ex.getMessage(), ex);
+                        log.error("[R2StorageService] Cover upload failed: {}", ex.getMessage());
+                        throw new RuntimeException("Cover upload failed: " + ex.getMessage(), ex);
                     }
-                    log.info("[R2StorageService] Upload ảnh bìa thành công");
+                    log.info("[R2StorageService] Cover uploaded successfully");
                     return publicDomain + "/" + key;
                 });
     }
 
     private void checkImageInput(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("Tệp tin hình ảnh không được để trống.");
+            throw new IllegalArgumentException("Image file must not be empty.");
         }
         List<String> allowedExtensions = List.of("image/jpeg",
                 "image/png",
                 "image/gif");
         if (!allowedExtensions.contains(file.getContentType())) {
             throw new IllegalArgumentException(
-                    "Định dạng hình ảnh không được hỗ trợ. Vui lòng tải lên tệp .jpeg, .png hoặc .gif.");
+                    "Unsupported image format. Please upload .jpeg, .png, or .gif file.");
         }
     }
 
@@ -128,7 +148,7 @@ public class R2StorageService {
         return signed.url().toString();
     }
 
-    public void uploadFolderFromPathSync(Path path, String prefix) throws IOException {
+    public String uploadFolderFromPathSync(Path path, String prefix) throws IOException {
         List<Path> files;
         try (Stream<Path> stream = Files.list(path)) {
             files = stream.filter(Files::isRegularFile).toList();
@@ -146,9 +166,10 @@ public class R2StorageService {
 
             s3Client.putObject(putOb, RequestBody.fromFile(filePath));
         }
+        return publicDomain + "/" + HlsUtil.normalizePrefix(prefix) + "master.m3u8";
     }
 
-    public void uploadFolderFromPathAsync(Path path, String id) throws IOException {
+    public CompletableFuture<String> uploadFolderFromPathAsync(Path path, String id) throws IOException {
 
         List<Path> files;
         try (Stream<Path> stream = Files.list(path)) {
@@ -167,32 +188,58 @@ public class R2StorageService {
                     .contentType(HlsUtil.getAudioContentType(fileName))
                     .build();
 
-            // Lấy giấy phép trước khi gửi request
+            // Acquire permit before sending request
             semaphore.acquireUninterruptibly();
 
-            // Trả về trực tiếp Future của S3, KHÔNG bọc qua runAsync, KHÔNG dùng .join()
-            // bên trong
+            // Return S3 Future directly, DO NOT wrap via runAsync, DO NOT use .join()
+            // inside
             return s3AsyncClient.putObject(putOb, AsyncRequestBody.fromFile(filePath))
                     .whenComplete((res, ex) -> {
-                        // Dù thành công hay thất bại (có Exception), luôn phải nhả giấy phép ra
+                        // Whether success or failure (Exception), must always release the permit
                         semaphore.release();
 
                         if (ex != null) {
-                            log.error("[R2StorageService] Upload thất bại cho tệp: {}: {}", fileName, ex.getMessage());
-                            throw new CompletionException("Đã xảy ra lỗi khi tải tệp tin lên máy chủ: " + fileName, ex);
+                            log.error("[R2StorageService] Upload failed for file : {}: {}", fileName, ex.getMessage());
+                            throw new CompletionException("Error occurred while uploading file to server: " + fileName,
+                                    ex);
                         }
                     })
                     .thenAccept(res -> {
                     });
         }).toList();
 
-        // Chờ tất cả tiến trình con hoàn tất. Nếu có bất kỳ exception nào trong
-        // whenComplete,
-        // .join() ở đây sẽ ném ra CompletionException để báo lỗi cho hàm gọi bên ngoài.
-        CompletableFuture.allOf(uploadTasks.toArray(new CompletableFuture[0])).join();
+        // Do not use .join() here anymore to avoid blocking main thread. Return
+        // CompletableFuture.
+        return CompletableFuture.allOf(uploadTasks.toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
+                    log.info("[R2StorageService] HLS folder uploaded successfully for song ID {}", id);
+                    return publicDomain + "/" + songAssets + "/" + id + "/" + hlsAssets + "/master.m3u8";
+                });
     }
 
-    public void uploadFolderEager(Path path, String prefix) throws IOException {
+    public CompletableFuture<Void> uploadSingleFileAsync(Path filePath, String songId) {
+        String fileName = filePath.getFileName().toString();
+        String key = songAssets + "/" + songId + "/" + hlsAssets + "/" + fileName;
+
+        PutObjectRequest putOb = PutObjectRequest.builder()
+                .bucket(mBucket)
+                .key(key)
+                .contentType(HlsUtil.getAudioContentType(fileName))
+                .build();
+
+        return s3AsyncClient.putObject(putOb, AsyncRequestBody.fromFile(filePath))
+                .whenComplete((res, ex) -> {
+                    if (ex != null) {
+                        log.error("[R2StorageService] Upload failed for file '{}': {}", fileName, ex.getMessage());
+                        throw new CompletionException("Error uploading file: " + fileName, ex);
+                    }
+                    log.debug("[R2StorageService] Uploaded single file: {}", key);
+                })
+                .thenAccept(res -> {
+                });
+    }
+
+    public String uploadFolderEager(Path path, String prefix) throws IOException {
         List<Path> files;
         try (Stream<Path> stream = Files.list(path)) {
             files = stream.filter(Files::isRegularFile).toList();
@@ -212,12 +259,13 @@ public class R2StorageService {
 
             s3Client.putObject(putOb, RequestBody.fromBytes(data));
         }
+        return publicDomain + "/" + HlsUtil.normalizePrefix(prefix) + "master.m3u8";
     }
 
-    public void deleteByPrefix(String bucket, String prefix) {
+    public void deleteByPrefix(String prefix) {
         try {
             ListObjectsV2Request listReq = ListObjectsV2Request.builder()
-                    .bucket(bucket)
+                    .bucket(mBucket)
                     .prefix(prefix)
                     .build();
 
@@ -228,15 +276,15 @@ public class R2StorageService {
 
             if (!toDelete.isEmpty()) {
                 DeleteObjectsRequest deleteReq = DeleteObjectsRequest.builder()
-                        .bucket(bucket)
+                        .bucket(mBucket)
                         .delete(Delete.builder().objects(toDelete).build())
                         .build();
                 s3Client.deleteObjects(deleteReq);
-                log.info("[R2StorageService] Đã dọn dẹp thành công {} tệp tin tại thư mục: {}", toDelete.size(),
+                log.info("[R2StorageService] Successfully cleaned up {} files in directory: {}", toDelete.size(),
                         prefix);
             }
         } catch (Exception e) {
-            log.error("[R2StorageService] Không thể dọn dẹp các tệp tin cũ (thư mục: {}). Chi tiết lỗi: {}", prefix,
+            log.error("[R2StorageService] Cannot clean up old files (directory: {}). Error details: {}", prefix,
                     e.getMessage());
         }
     }

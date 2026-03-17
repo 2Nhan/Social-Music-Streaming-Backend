@@ -59,7 +59,7 @@ public class HlsUtil {
                 playlistPattern);
 
         ProcessBuilder pb = new ProcessBuilder(cmd);
-        pb.redirectErrorStream(true); // Gom chung Error stream và Standard stream
+        pb.redirectErrorStream(true);
 
         // Khởi chạy tiến trình
         return pb.start();
@@ -67,10 +67,10 @@ public class HlsUtil {
 
     public static void checkInputMp3(MultipartFile mp3) {
         if (mp3 == null || mp3.isEmpty()) {
-            throw new IllegalArgumentException("Tệp tin âm thanh không được để trống.");
+            throw new IllegalArgumentException("Audio file must not be empty.");
         }
         if (!Objects.requireNonNull(mp3.getOriginalFilename()).endsWith(".mp3")) {
-            throw new IllegalArgumentException("Định dạng tệp không được hỗ trợ. Vui lòng tải lên tệp định dạng .mp3.");
+            throw new IllegalArgumentException("Unsupported file format. Please upload an .mp3 file.");
         }
     }
 
@@ -87,10 +87,11 @@ public class HlsUtil {
         // Files.walk() liệt kê toàn bộ các folder/file con ở tất cả các cấp
         try (Stream<Path> walk = Files.walk(dir)) {
             // Kết quả từ Files.walk() trả về có thể là các thứ tự bất kì
-            // Nếu hệ thống xóa 1 thứ mục mà trong thư mục đó vẫn còn tồn tại các file con
-            // Thì sẽ gây ra lỗi vì ko thể xóa thư mục khi tồn tại các file con bên trong đó
-            // Sort theo reverse order đảm bảo xóa theo thứ tự từ file ở cấp thấp nhất
-            // Đảm bảo việc xóa các file ko gặp lỗi
+            // If system deletes a directory while child files still exist inside it
+            // It will cause an error because a directory cannot be deleted when child files
+            // exist inside it
+            // Sort by reverse order to ensure deleting from the lowest level file first
+            // Ensure deleting files without error
             walk.sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);

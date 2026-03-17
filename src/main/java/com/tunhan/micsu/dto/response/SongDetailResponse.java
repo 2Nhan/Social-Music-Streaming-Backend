@@ -1,0 +1,26 @@
+package com.tunhan.micsu.dto.response;
+
+import com.tunhan.micsu.entity.enums.Visibility;
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class SongDetailResponse {
+    private String id;
+    private String title;
+    private String description;
+    private String coverUrl;
+    private String audioUrl;
+    private Long duration;
+    private String lyricsData;
+    private Long favoriteCount;
+    private Long viewCount;
+    private Long repostCount;
+    private Visibility visibility;
+    private String uploadedBy;
+    private String createdAt;
+    private String updatedAt;
+}

@@ -5,6 +5,7 @@ import com.tunhan.micsu.utils.HlsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.CompletableFuture;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,7 @@ public class HlsServiceV3Impl implements HlsService {
     private final R2StorageService r2;
 
     @Override
-    public void processHls(Path path, String songId) throws IOException {
+    public String processHls(Path path, String songId) throws IOException {
         Path outDir = Files.createTempDirectory("hls-out-");
         Process p = null;
 
@@ -43,18 +44,20 @@ public class HlsServiceV3Impl implements HlsService {
             logReader.join();
 
             if (exitCode != 0) {
-                throw new IOException("Quá trình xử lý âm thanh (FFmpeg) thất bại với mã lỗi: " + exitCode);
+                throw new IOException("Audio processing (FFmpeg) failed with exit code: " + exitCode);
             }
 
-            r2.uploadFolderFromPathAsync(outDir, songId);
-            log.info("[HlsServiceV3] upload hls thành công: songId={}", songId);
+            CompletableFuture<String> masterUrlFuture = r2.uploadFolderFromPathAsync(outDir, songId);
+            String masterUrl = masterUrlFuture.join();
+            log.info("[HlsServiceV3] Upload HLS successfully: songId={}, masterUrl={}", songId, masterUrl);
+            return masterUrl;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             if (p != null && p.isAlive()) {
                 p.destroyForcibly();
             }
-            throw new IOException("Tiến trình xử lý HLS bị gián đoạn ngẫu nhiên", e);
+            throw new IOException("HLS processing randomly interrupted", e);
         } finally {
             HlsUtil.cleanup(outDir);
         }

@@ -19,7 +19,7 @@ public class HlsServiceV2Impl implements HlsService {
     private final R2StorageService r2;
 
     @Override
-    public void processHls(Path path, String songId) throws IOException {
+    public String processHls(Path path, String songId) throws IOException {
         Path outDir = Files.createTempDirectory("hls-out-");
         Process p = null;
 
@@ -44,19 +44,20 @@ public class HlsServiceV2Impl implements HlsService {
             logReader.join();
 
             if (exitCode != 0) {
-                throw new IOException("Quá trình xử lý âm thanh (FFmpeg) thất bại với mã lỗi: " + exitCode
-                        + "\nNhật ký lỗi:\n" + ffmpegLogs);
+                throw new IOException("Audio processing (FFmpeg) failed with exit code: " + exitCode
+                        + "\nError log:\n" + ffmpegLogs);
             }
 
-            r2.uploadFolderFromPathSync(outDir, songId);
-            log.info("[HlsServiceV2] upload hls thành công: songId={}", songId);
+            String masterUrl = r2.uploadFolderFromPathSync(outDir, "songs/" + songId + "/hls/");
+            log.info("[HlsServiceV2] upload hls successfully: songId={}, masterUrl={}", songId, masterUrl);
+            return masterUrl;
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             if (p != null && p.isAlive()) {
                 p.destroyForcibly();
             }
-            throw new IOException("Tiến trình xử lý HLS bị gián đoạn ngẫu nhiên", e);
+            throw new IOException("HLS processing randomly interrupted", e);
         } finally {
             HlsUtil.cleanup(outDir);
         }
