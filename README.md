@@ -48,7 +48,7 @@ src/main/java/com/tunhan/micsu/
 ├── controller/   # REST API Layer
 ├── service/      # Business Logic
 ├── repository/   # Data Access Layer
-├── entity/       # Domain Models (JPA)
+├── entity/       # Domain Models 
 ├── dto/          # Data Transfer Objects
 ├── security/     # JWT & Auth Filters
 └── utils/        # Helper Utilities (HLS, File handling)
