@@ -10,8 +10,6 @@ This is a robust music streaming backend API inspired by SoundCloud. It provides
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Architecture](#-architecture)
 - [🚀 Getting Started](#-getting-started)
-- [📚 API Documentation](#-api-documentation)
-- [📄 License](#-license)
 ---
 ## 🎯 Key Features
 ### 🔐 Authentication & Security
@@ -44,7 +42,7 @@ This is a robust music streaming backend API inspired by SoundCloud. It provides
 ---
 ## 🏗️ Architecture
 The project follows a **Monolithic Layered Architecture**:
-`	ext
+`	
 src/main/java/com/tunhan/micsu/
 ├── config/       # Configuration 
 ├── controller/   # REST API Layer
