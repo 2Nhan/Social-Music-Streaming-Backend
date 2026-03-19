@@ -32,11 +32,6 @@ public class AuthController {
                 authService.login(request)));
     }
 
-    /**
-     * Issues a new access + refresh token pair using a valid refresh token.
-     * The old refresh token is rotated (deleted from Redis, replaced with a new
-     * one).
-     */
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(
             @Valid @RequestBody RefreshTokenRequest request) {
@@ -44,13 +39,6 @@ public class AuthController {
                 authService.refresh(request.getRefreshToken())));
     }
 
-    /**
-     * Logs out the user by:
-     * 1. Revoking the refresh token from Redis.
-     * 2. Blacklisting the current access token in Redis for its remaining TTL.
-     *
-     * The access token is read from the Authorization header (Bearer <token>).
-     */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
             @Valid @RequestBody RefreshTokenRequest request,

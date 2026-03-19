@@ -21,22 +21,26 @@ public class AsyncConfig {
         executor.setCorePoolSize(2);
 
         // 2. Số luồng TỐI ĐA được phép chạy cùng lúc nếu hàng đợi đầy
-        // Xử lý FFmpeg rất nặng CPU, không nên set quá cao (chỉ nên từ 4 - 8)
+        // FFmpeg processing is very CPU-intensive, should not be set too high (only 4 -
+        // 8)
         executor.setMaxPoolSize(4);
 
         // 3. Sức chứa của hàng đợi (Queue)
-        // Nếu 4 luồng trên đều đang bận chạy FFmpeg, người thứ 5 upload sẽ được đưa vào hàng đợi này.
+        // Nếu 4 luồng trên đều đang bận chạy FFmpeg, người thứ 5 upload sẽ được đưa vào
+        // hàng đợi này.
         // Hàng đợi chứa được tối đa 50 bài hát đang chờ.
         executor.setQueueCapacity(50);
 
-        // 4. Đặt tên tiền tố cho luồng để dễ dò lỗi trong file log
+        // 4. Set thread name prefix to easily find errors in log file
         executor.setThreadNamePrefix("HlsEncoder-");
 
-        // 5. Chính sách xử lý khi hệ thống quá tải (Quá 4 luồng bận + Hàng đợi 50 cũng đầy)
-        // CallerRunsPolicy: Bắt luồng chính (luồng HTTP) tự đi mà chạy, giúp giảm tốc độ nhận request mới.
+        // 5. Chính sách xử lý khi hệ thống quá tải (Quá 4 luồng bận + Hàng đợi 50 cũng
+        // đầy)
+        // CallerRunsPolicy: Bắt luồng chính (luồng HTTP) tự đi mà chạy, giúp giảm tốc
+        // độ nhận request mới.
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-        // 6. Cho phép luồng tự động tắt nếu để không quá lâu (tiết kiệm RAM)
+        // 6. Allow threads to automatically shutdown if idle for too long (save RAM)
         executor.setAllowCoreThreadTimeOut(true);
 
         executor.initialize();

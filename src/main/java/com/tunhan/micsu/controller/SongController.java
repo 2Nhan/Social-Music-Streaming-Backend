@@ -20,7 +20,7 @@ public class SongController {
 
     private final SongService songService;
 
-    @PostMapping(value = "/songs", consumes = "multipart/form-data")
+    @PostMapping(value = "/songs/upload", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<Void>> uploadSong(
             @ModelAttribute SongUploadRequest request,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
@@ -30,7 +30,7 @@ public class SongController {
         return ResponseEntity.ok(ApiResponse.success("Song uploaded successfully", null));
     }
 
-    @PostMapping("/songs/upload")
+    @PostMapping("/songs/uploadV2")
     public ResponseEntity<ApiResponse<Void>> uploadSongV2(
             @ModelAttribute SongUploadRequest request,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
