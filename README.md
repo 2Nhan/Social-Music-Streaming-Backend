@@ -10,8 +10,6 @@ This is a robust music streaming backend API inspired by SoundCloud. It provides
 - [🛠️ Tech Stack](#️-tech-stack)
 - [🏗️ Architecture](#-architecture)
 - [🚀 Getting Started](#-getting-started)
-- [📚 API Documentation](#-api-documentation)
-- [📄 License](#-license)
 ---
 ## 🎯 Key Features
 ### 🔐 Authentication & Security
@@ -44,19 +42,19 @@ This is a robust music streaming backend API inspired by SoundCloud. It provides
 ---
 ## 🏗️ Architecture
 The project follows a **Monolithic Layered Architecture**:
-`	ext
+```text
 src/main/java/com/tunhan/micsu/
 ├── config/       # Configuration 
 ├── controller/   # REST API Layer
 ├── service/      # Business Logic
 ├── repository/   # Data Access Layer
-├── entity/       # Domain Models (JPA)
+├── entity/       # Domain Models 
 ├── dto/          # Data Transfer Objects
 ├── security/     # JWT & Auth Filters
 └── utils/        # Helper Utilities (HLS, File handling)
-`
+```
 **Key Workflows:**
-1. **Upload**: Client uploads audio -> Async Service processes with FFmpeg -> HLS segments stored in Cloudflare R2 -> Database updated.
+1. **Upload**: Client uploads audio -> Processes with FFmpeg -> HLS segments stored in Cloudflare R2 -> Database updated.
 2. **Stream**: Application serves .m3u8 playlists linking to storage URLs.
 ---
 
