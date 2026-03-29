@@ -32,11 +32,11 @@ public class SecurityConfig {
             "/api/v1/auth/register",
             "/api/v1/auth/login",
             "/api/v1/auth/refresh",
-            "/api/v1/songs", // TODO: remove after testing
-            "/api/v1/songs/upload", // TODO: remove after testing
-            "/api/v1/hls", // TODO: remove after testing
-            "/api/v2/hls", // TODO: remove after testing
-            "/api/v3/hls" // TODO: remove after testing
+//            "/api/v1/songs", // TODO: remove after testing
+//            "/api/v1/songs/upload", // TODO: remove after testing
+//            "/api/v1/hls", // TODO: remove after testing
+//            "/api/v2/hls", // TODO: remove after testing
+//            "/api/v3/hls" // TODO: remove after testing
     };
 
     private static final String[] PUBLIC_DELETE = {
