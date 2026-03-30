@@ -24,8 +24,10 @@ public class SongController {
     public ResponseEntity<ApiResponse<Void>> uploadSong(
             @ModelAttribute SongUploadRequest request,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
-        if (jwt != null)
+        if (jwt != null) {
             request.setUploadedBy(jwt.getSubject());
+        }
+
         songService.uploadSong(request);
         return ResponseEntity.ok(ApiResponse.success("Song uploaded successfully", null));
     }

@@ -2,8 +2,8 @@ spring:
   application:
     name: micsu
   datasource:
-    url: "jdbc:mysql://localhost:3306/music_player"
-    username: root
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   data:
     redis:
@@ -31,9 +31,8 @@ storage:
     secretKey: ${R2_SECRET_KEY}
     mBucket: ${R2_BUCKET}
     endpoint: https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
-    iBucket: image-bucket
-    publicDomain: https://crmsoft.site
+    publicDomain: https://hi.crmsoft.site
 jwt:
-  secret: ${JWT_SECRET:micsu-super-secret-key-at-least-256-bits-long-for-hs256-algorithm}
-  expiration: 900000        # 15 minutes — access token TTL (ms)
-  refresh-expiration-days: 30  # 30 days  — refresh token TTL
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION}

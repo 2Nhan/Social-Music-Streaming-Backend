@@ -47,13 +47,14 @@ public class SongServiceImpl implements SongService {
         this.hlsServiceV2 = hlsServiceV2;
     }
 
-
     @Override
+    @Transactional
     public void uploadSong(SongUploadRequest request) throws IOException {
         doUpload(request, hlsServiceV3);
     }
 
     @Override
+    @Transactional
     public void uploadSongV2(SongUploadRequest request) throws IOException {
         doUpload(request, hlsServiceV2);
     }
