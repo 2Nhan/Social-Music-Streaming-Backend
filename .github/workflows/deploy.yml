@@ -65,8 +65,11 @@ jobs:
           # Kéo image mới về
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/micsu-app:latest
           
-          # Update lại docker-compose
-          docker compose down
-          docker compose up -d
+          # Truyền tham số DOCKER IMAGE vào Shell để docker-compose V1 hiểu
+          export APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/micsu-app:latest
+          
+          # Update lại docker-compose (Phiên bản v1 dùng dấu gạch ngang)
+          docker-compose down
+          docker-compose up -d
           
           docker system prune -f
