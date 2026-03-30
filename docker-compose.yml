@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   micsu-app:
-    image: ${APP_IMAGE}
+    image: nhanle13/micsu-app:latest
     container_name: micsu-app
     restart: always
     ports:

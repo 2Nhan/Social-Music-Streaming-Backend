@@ -53,6 +53,7 @@ jobs:
         username: ubuntu                         # Username của EC2 Ubuntu
         key: ${{ secrets.AWS_SSH_KEY }}          # Nội dung file .pem private key
         script: |
+          set -e
           mkdir -p ~/micsu/nginx/ssl
           mkdir -p ~/micsu/nginx/conf.d
           cd ~/micsu
@@ -64,9 +65,6 @@ jobs:
           
           # Kéo image mới về
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/micsu-app:latest
-          
-          # Truyền tham số DOCKER IMAGE vào Shell để docker-compose V1 hiểu
-          export APP_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/micsu-app:latest
           
           # Update lại docker-compose (Phiên bản v1 dùng dấu gạch ngang)
           docker-compose down
