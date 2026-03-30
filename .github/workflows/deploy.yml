@@ -55,7 +55,6 @@ jobs:
         script: |
           mkdir -p ~/micsu/nginx/ssl
           mkdir -p ~/micsu/nginx/conf.d
-          mkdir -p ~/micsu/uploads
           cd ~/micsu
           
           # Lưu ý: Cần sync các file docker-compose.yml và thư mục nginx lên EC2 thủ công hoặc dùng rsync trong step trước.
