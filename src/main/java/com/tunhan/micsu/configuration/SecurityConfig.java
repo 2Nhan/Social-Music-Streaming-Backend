@@ -44,7 +44,7 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_GET = {
-            "/api/v1/songs/{id}",
+            "/api/v1/songs/{id}/**",
             "/api/v1/songs/*/comments",
             "/api/v1/users/{id}",
             "/api/v1/users/{id}/songs",

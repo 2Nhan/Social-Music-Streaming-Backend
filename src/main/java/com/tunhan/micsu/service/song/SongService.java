@@ -14,6 +14,8 @@ public interface SongService {
 
     SongDetailResponse getSongById(String id, String requesterId);
 
+    String playSong(String id);
+
     SongDetailResponse updateSong(String id, SongUpdateRequest request, String userId);
 
     void deleteSong(String id, String userId);

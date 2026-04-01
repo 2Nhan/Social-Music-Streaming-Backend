@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class SongUploadRequest {
     @NotBlank
-    private String name;
+    private String title;
 
     private String description;
 

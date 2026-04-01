@@ -13,7 +13,6 @@ public class SongDetailResponse {
     private String title;
     private String description;
     private String coverUrl;
-    private String audioUrl;
     private Long duration;
     private String lyricsData;
     private Long favoriteCount;

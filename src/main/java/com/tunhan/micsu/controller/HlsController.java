@@ -1,8 +1,10 @@
 package com.tunhan.micsu.controller;
 
+import com.tunhan.micsu.dto.response.SongDetailResponse;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.repository.SongRepository;
+import com.tunhan.micsu.service.song.SongService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,21 +19,15 @@ import java.net.URI;
 @RequestMapping("/api/v1/songs")
 public class HlsController {
 
-    private final SongRepository songRepository;
+    private final SongService songService;
 
-    @GetMapping("/{songId}/hls/master.m3u8")
+    @GetMapping("/{songId}/stream/master.m3u8")
     public ResponseEntity<Void> streamHls(@PathVariable String songId) {
-        Song song = songRepository.findById(songId)
-                .orElseThrow(() -> new ResourceNotFoundException("Song", songId));
-
-        if (song.getAudioUrl() == null || song.getAudioUrl().isBlank()) {
-            log.warn("[HlsController] Song {} has no HLS URL", songId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        String audioUrl = songService.playSong(songId);
 
         log.info("[HlsController] Redirecting HLS stream for song {}", songId);
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(song.getAudioUrl()))
+                .location(URI.create(audioUrl))
                 .build();
     }
 }

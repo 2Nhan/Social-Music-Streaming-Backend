@@ -15,6 +15,8 @@ import com.tunhan.micsu.utils.AudioMetadataUtil;
 import com.tunhan.micsu.utils.HlsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +69,7 @@ public class SongServiceImpl implements SongService {
         CompletableFuture<String> coverFuture = null;
 
         try {
-            log.info("[SongService] Begin processing song upload. Name: '{}', ID: {}", request.getName(), id);
+            log.info("[SongService] Begin processing song upload. Name: '{}', ID: {}", request.getTitle(), id);
 
             tempMp3 = Files.createTempFile("upload_", ".mp3");
             request.getAudioFile().transferTo(tempMp3);
@@ -84,7 +86,7 @@ public class SongServiceImpl implements SongService {
 
             Song song = new Song();
             song.setId(id);
-            song.setTitle(request.getName());
+            song.setTitle(request.getTitle());
             song.setDescription(request.getDescription());
             song.setCoverUrl(coverUrl);
             song.setAudioUrl(hlsUrl);
@@ -122,6 +124,17 @@ public class SongServiceImpl implements SongService {
                 .orElseThrow(() -> new ResourceNotFoundException("Song", id));
         checkVisibility(song, requesterId);
         return toDetailResponse(song);
+    }
+
+    @Override
+    public String playSong(String id) {
+        Song song = songRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Song", id));
+        if (song.getAudioUrl() == null || song.getAudioUrl().isBlank()) {
+            log.warn("[HlsController] Song {} has no HLS URL", id);
+            throw new ResourceNotFoundException("Empty audio file with song: 3s", id);
+        }
+        return song.getAudioUrl();
     }
 
     @Override
@@ -182,7 +195,6 @@ public class SongServiceImpl implements SongService {
                 .title(song.getTitle())
                 .description(song.getDescription())
                 .coverUrl(song.getCoverUrl())
-                .audioUrl(song.getAudioUrl())
                 .duration(song.getDuration())
                 .lyricsData(song.getLyricsData())
                 .favoriteCount(song.getFavoriteCount())
