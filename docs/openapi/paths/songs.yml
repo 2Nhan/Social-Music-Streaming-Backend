@@ -1,0 +1,249 @@
+# Song endpoints from SongController & HlsController
+
+UploadSong:
+  post:
+    tags: [Songs]
+    summary: Upload a new song
+    operationId: uploadSong
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '../components/schemas/request/SongUploadRequest.yml'
+    responses:
+      '200':
+        description: Song uploaded successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '400':
+        description: Validation failed or invalid input.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '500':
+        description: File processing error.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UploadSongV2:
+  post:
+    tags: [Songs]
+    summary: Upload a new song (V2 pipeline)
+    operationId: uploadSongV2
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '../components/schemas/request/SongUploadRequest.yml'
+    responses:
+      '200':
+        description: Song uploaded successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '400':
+        description: Validation failed or invalid input.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '500':
+        description: File processing error.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+SongById:
+  get:
+    tags: [Songs]
+    summary: Get song details by ID
+    operationId: getSongById
+    security:
+      - BearerAuth: []
+      - {}
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Song details.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/SongDetailResponse.yml'
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  put:
+    tags: [Songs]
+    summary: Update song metadata
+    operationId: updateSong
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/SongUpdateRequest.yml'
+    responses:
+      '200':
+        description: Song updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/SongDetailResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the song owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  delete:
+    tags: [Songs]
+    summary: Delete a song
+    operationId: deleteSong
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Song deleted.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the song owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+StreamHls:
+  get:
+    tags: [Songs]
+    summary: Get HLS master playlist (redirects to stream URL)
+    operationId: streamHls
+    security:
+      - BearerAuth: []
+      - {}
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '302':
+        description: Redirect to the HLS master playlist URL.
+        headers:
+          Location:
+            schema:
+              type: string
+              format: uri
+            description: URL to the HLS master playlist (.m3u8).
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

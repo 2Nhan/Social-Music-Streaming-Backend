@@ -1,0 +1,7 @@
+type: object
+required:
+  - refreshToken
+properties:
+  refreshToken:
+    type: string
+    description: The refresh token to use for obtaining a new access token.

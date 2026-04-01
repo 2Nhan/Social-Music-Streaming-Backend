@@ -1,0 +1,339 @@
+# User endpoints from UserController
+
+UserById:
+  get:
+    tags: [Users]
+    summary: Get user profile by ID
+    operationId: getUserById
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+    responses:
+      '200':
+        description: User profile.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/UserProfileResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  put:
+    tags: [Users]
+    summary: Update user profile
+    operationId: updateProfile
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/UpdateProfileRequest.yml'
+    responses:
+      '200':
+        description: Profile updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/UserProfileResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the profile owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UserSongs:
+  get:
+    tags: [Users]
+    summary: Get a user's songs (paginated)
+    operationId: getUserSongs
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+      - in: query
+        name: sort
+        schema:
+          type: string
+          default: 'createdAt,desc'
+        description: >-
+          Sort field and direction. Format: `field,direction`
+          (e.g. `createdAt,desc` or `title,asc`).
+    responses:
+      '200':
+        description: Paginated list of user's songs.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/SongDetailResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UserFollowers:
+  get:
+    tags: [Users]
+    summary: Get a user's followers (paginated)
+    operationId: getFollowers
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated list of followers.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/UserProfileResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UserFollowing:
+  get:
+    tags: [Users]
+    summary: Get users that a user is following (paginated)
+    operationId: getFollowing
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated list of followed users.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/UserProfileResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UserLikes:
+  get:
+    tags: [Users]
+    summary: Get a user's likes (paginated)
+    operationId: getUserLikes
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated list of user's likes.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/LikeResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+UserReposts:
+  get:
+    tags: [Users]
+    summary: Get a user's reposts (paginated)
+    operationId: getUserReposts
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated list of user's reposts.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/RepostResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

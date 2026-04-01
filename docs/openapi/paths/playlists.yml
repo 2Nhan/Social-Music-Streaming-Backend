@@ -1,0 +1,277 @@
+# Playlist endpoints from PlaylistController
+
+PlaylistCollection:
+  post:
+    tags: [Playlists]
+    summary: Create a new playlist
+    operationId: createPlaylist
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/PlaylistRequest.yml'
+    responses:
+      '200':
+        description: Playlist created successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/PlaylistResponse.yml'
+      '400':
+        description: Validation failed.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+PlaylistById:
+  get:
+    tags: [Playlists]
+    summary: Get playlist by ID
+    operationId: getPlaylistById
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist ID.
+    responses:
+      '200':
+        description: Playlist details.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/PlaylistResponse.yml'
+      '404':
+        description: Playlist not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  put:
+    tags: [Playlists]
+    summary: Update a playlist
+    operationId: updatePlaylist
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist ID.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/PlaylistRequest.yml'
+    responses:
+      '200':
+        description: Playlist updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/PlaylistResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the playlist owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Playlist not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  delete:
+    tags: [Playlists]
+    summary: Delete a playlist
+    operationId: deletePlaylist
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist ID.
+    responses:
+      '200':
+        description: Playlist deleted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the playlist owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Playlist not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+PlaylistSongs:
+  post:
+    tags: [Playlists]
+    summary: Add a song to a playlist
+    operationId: addSongToPlaylist
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist ID.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/AddSongToPlaylistRequest.yml'
+    responses:
+      '200':
+        description: Song added to playlist successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/PlaylistResponse.yml'
+      '400':
+        description: Validation failed.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the playlist owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Playlist or song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '409':
+        description: Song already in playlist.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+PlaylistSongById:
+  delete:
+    tags: [Playlists]
+    summary: Remove a song from a playlist
+    operationId: removeSongFromPlaylist
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist ID.
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Song removed from playlist successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/PlaylistResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the playlist owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Playlist, song, or association not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

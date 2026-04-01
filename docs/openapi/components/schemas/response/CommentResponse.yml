@@ -1,0 +1,18 @@
+type: object
+properties:
+  id:
+    type: string
+  songId:
+    type: string
+  userId:
+    type: string
+  content:
+    type: string
+  timestampInSong:
+    type: integer
+    format: int64
+    nullable: true
+    description: Position in audio in milliseconds.
+  createdAt:
+    type: string
+    description: ISO 8601 timestamp.

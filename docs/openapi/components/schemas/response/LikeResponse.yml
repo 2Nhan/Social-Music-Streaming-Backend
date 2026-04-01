@@ -1,0 +1,11 @@
+type: object
+properties:
+  id:
+    type: string
+  targetType:
+    $ref: './TargetType.yml'
+  targetId:
+    type: string
+  createdAt:
+    type: string
+    description: ISO 8601 timestamp.

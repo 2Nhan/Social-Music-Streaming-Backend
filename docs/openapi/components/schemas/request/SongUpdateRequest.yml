@@ -1,0 +1,13 @@
+type: object
+properties:
+  title:
+    type: string
+    nullable: true
+  description:
+    type: string
+    nullable: true
+  lyricsData:
+    type: string
+    nullable: true
+  visibility:
+    $ref: '../response/Visibility.yml'

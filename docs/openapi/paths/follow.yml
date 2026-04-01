@@ -1,0 +1,85 @@
+# Follow endpoints from FollowController
+
+FollowUser:
+  post:
+    tags: [Follow]
+    summary: Follow a user
+    operationId: followUser
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: ID of the user to follow.
+    responses:
+      '200':
+        description: Followed user successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: User not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '409':
+        description: Already following this user.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  delete:
+    tags: [Follow]
+    summary: Unfollow a user
+    operationId: unfollowUser
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: ID of the user to unfollow.
+    responses:
+      '200':
+        description: Unfollowed user successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: User or follow relationship not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

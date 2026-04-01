@@ -1,0 +1,98 @@
+# Like endpoints from LikeController
+# Base: /api/v1/likes
+
+Like:
+  post:
+    tags: [Likes]
+    summary: Like a song or playlist
+    operationId: like
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/request/LikeRequest.yml'
+    responses:
+      '200':
+        description: Liked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/LikeResponse.yml'
+      '400':
+        description: Validation failed.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Target entity not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '409':
+        description: Already liked.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+Unlike:
+  delete:
+    tags: [Likes]
+    summary: Unlike (remove a like)
+    operationId: unlike
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Like ID.
+    responses:
+      '200':
+        description: Unliked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '403':
+        description: Access denied — not the like owner.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Like not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

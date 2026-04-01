@@ -1,0 +1,5 @@
+type: string
+enum:
+  - SONG
+  - PLAYLIST
+description: The type of entity being targeted.

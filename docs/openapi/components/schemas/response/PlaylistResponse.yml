@@ -1,0 +1,22 @@
+type: object
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  description:
+    type: string
+    nullable: true
+  coverImage:
+    type: string
+    nullable: true
+  visibility:
+    $ref: './Visibility.yml'
+  songCount:
+    type: integer
+    format: int64
+  createdBy:
+    type: string
+  createdAt:
+    type: string
+    description: ISO 8601 timestamp.

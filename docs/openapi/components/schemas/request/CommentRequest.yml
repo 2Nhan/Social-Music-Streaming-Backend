@@ -1,0 +1,12 @@
+type: object
+required:
+  - content
+properties:
+  content:
+    type: string
+    description: The comment text.
+  timestampInSong:
+    type: integer
+    format: int64
+    nullable: true
+    description: Position in audio in milliseconds. Optional.

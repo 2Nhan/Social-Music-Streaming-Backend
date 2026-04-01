@@ -1,0 +1,19 @@
+type: object
+description: Paginated response wrapper.
+properties:
+  content:
+    type: array
+    items: {}
+    description: Array of items for the current page.
+  page:
+    type: integer
+    format: int32
+    description: Current page number (0-indexed).
+  size:
+    type: integer
+    format: int32
+    description: Number of items per page.
+  totalElements:
+    type: integer
+    format: int64
+    description: Total number of items across all pages.

@@ -1,0 +1,170 @@
+openapi: 3.0.3
+
+info:
+  title: Micsu – Music Streaming API
+  description: >-
+    RESTful API for the Micsu music streaming platform.
+    Provides endpoints for authentication, song management, playlist management,
+    social features (likes, comments, reposts, follows), user profiles, and
+    listening history.
+  version: 1.0.0
+  contact:
+    name: TunHan
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Registration, login, token refresh, and logout.
+  - name: Songs
+    description: Song upload, retrieval, update, deletion, and HLS streaming.
+  - name: Comments
+    description: Song comments (add, list, delete).
+  - name: Likes
+    description: Like/unlike songs and playlists.
+  - name: Follow
+    description: Follow/unfollow users.
+  - name: Playlists
+    description: Playlist CRUD and song management within playlists.
+  - name: Reposts
+    description: Repost/unrepost songs.
+  - name: Users
+    description: User profiles, songs, followers, following, likes, reposts.
+  - name: History
+    description: Listening history and current user's liked songs.
+
+paths:
+  # ── Auth ──────────────────────────────────────────────────
+  /api/v1/auth/register:
+    $ref: './paths/auth.yml#/Register'
+  /api/v1/auth/login:
+    $ref: './paths/auth.yml#/Login'
+  /api/v1/auth/refresh:
+    $ref: './paths/auth.yml#/Refresh'
+  /api/v1/auth/logout:
+    $ref: './paths/auth.yml#/Logout'
+
+  # ── Songs ─────────────────────────────────────────────────
+  /api/v1/songs/upload:
+    $ref: './paths/songs.yml#/UploadSong'
+  /api/v1/songs/uploadV2:
+    $ref: './paths/songs.yml#/UploadSongV2'
+  /api/v1/songs/{id}:
+    $ref: './paths/songs.yml#/SongById'
+  /api/v1/songs/{songId}/stream/master.m3u8:
+    $ref: './paths/songs.yml#/StreamHls'
+
+  # ── Comments ──────────────────────────────────────────────
+  /api/v1/songs/{songId}/comments:
+    $ref: './paths/comments.yml#/SongComments'
+  /api/v1/comments/{id}:
+    $ref: './paths/comments.yml#/DeleteComment'
+
+  # ── Likes ─────────────────────────────────────────────────
+  /api/v1/likes:
+    $ref: './paths/likes.yml#/Like'
+  /api/v1/likes/{id}:
+    $ref: './paths/likes.yml#/Unlike'
+
+  # ── Follow ────────────────────────────────────────────────
+  /api/v1/follow/{userId}:
+    $ref: './paths/follow.yml#/FollowUser'
+
+  # ── Playlists ─────────────────────────────────────────────
+  /api/v1/playlists:
+    $ref: './paths/playlists.yml#/PlaylistCollection'
+  /api/v1/playlists/{id}:
+    $ref: './paths/playlists.yml#/PlaylistById'
+  /api/v1/playlists/{id}/songs:
+    $ref: './paths/playlists.yml#/PlaylistSongs'
+  /api/v1/playlists/{id}/songs/{songId}:
+    $ref: './paths/playlists.yml#/PlaylistSongById'
+
+  # ── Reposts ───────────────────────────────────────────────
+  /api/v1/songs/{songId}/repost:
+    $ref: './paths/reposts.yml#/SongRepost'
+
+  # ── Users ─────────────────────────────────────────────────
+  /api/v1/users/{id}:
+    $ref: './paths/users.yml#/UserById'
+  /api/v1/users/{id}/songs:
+    $ref: './paths/users.yml#/UserSongs'
+  /api/v1/users/{id}/followers:
+    $ref: './paths/users.yml#/UserFollowers'
+  /api/v1/users/{id}/following:
+    $ref: './paths/users.yml#/UserFollowing'
+  /api/v1/users/{id}/likes:
+    $ref: './paths/users.yml#/UserLikes'
+  /api/v1/users/{id}/reposts:
+    $ref: './paths/users.yml#/UserReposts'
+
+  # ── History / Me ──────────────────────────────────────────
+  /api/v1/users/me/history/{songId}:
+    $ref: './paths/history.yml#/LogListen'
+  /api/v1/users/me/history:
+    $ref: './paths/history.yml#/GetHistory'
+  /api/v1/users/me/likes:
+    $ref: './paths/history.yml#/GetMyLikedSongs'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: './components/securitySchemes.yml#/BearerAuth'
+
+  schemas:
+    # ── Request DTOs ──
+    LoginRequest:
+      $ref: './components/schemas/request/LoginRequest.yml'
+    RegisterRequest:
+      $ref: './components/schemas/request/RegisterRequest.yml'
+    RefreshTokenRequest:
+      $ref: './components/schemas/request/RefreshTokenRequest.yml'
+    CommentRequest:
+      $ref: './components/schemas/request/CommentRequest.yml'
+    LikeRequest:
+      $ref: './components/schemas/request/LikeRequest.yml'
+    PlaylistRequest:
+      $ref: './components/schemas/request/PlaylistRequest.yml'
+    AddSongToPlaylistRequest:
+      $ref: './components/schemas/request/AddSongToPlaylistRequest.yml'
+    SongUploadRequest:
+      $ref: './components/schemas/request/SongUploadRequest.yml'
+    SongUpdateRequest:
+      $ref: './components/schemas/request/SongUpdateRequest.yml'
+    UpdateProfileRequest:
+      $ref: './components/schemas/request/UpdateProfileRequest.yml'
+
+    # ── Response DTOs ──
+    ApiResponse:
+      $ref: './components/schemas/response/ApiResponse.yml'
+    ErrorResponse:
+      $ref: './components/schemas/response/ErrorResponse.yml'
+    AuthResponse:
+      $ref: './components/schemas/response/AuthResponse.yml'
+    CommentResponse:
+      $ref: './components/schemas/response/CommentResponse.yml'
+    LikeResponse:
+      $ref: './components/schemas/response/LikeResponse.yml'
+    PlaylistResponse:
+      $ref: './components/schemas/response/PlaylistResponse.yml'
+    RepostResponse:
+      $ref: './components/schemas/response/RepostResponse.yml'
+    SongDetailResponse:
+      $ref: './components/schemas/response/SongDetailResponse.yml'
+    UserProfileResponse:
+      $ref: './components/schemas/response/UserProfileResponse.yml'
+    ListeningHistoryResponse:
+      $ref: './components/schemas/response/ListeningHistoryResponse.yml'
+    PageResponse:
+      $ref: './components/schemas/response/PageResponse.yml'
+
+    # ── Enums ──
+    TargetType:
+      $ref: './components/schemas/response/TargetType.yml'
+    Visibility:
+      $ref: './components/schemas/response/Visibility.yml'

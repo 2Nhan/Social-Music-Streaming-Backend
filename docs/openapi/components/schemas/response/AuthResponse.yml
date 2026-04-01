@@ -1,0 +1,12 @@
+type: object
+properties:
+  accessToken:
+    type: string
+    description: JWT access token.
+  refreshToken:
+    type: string
+    description: JWT refresh token.
+  tokenType:
+    type: string
+    default: Bearer
+    description: Token type, always "Bearer".

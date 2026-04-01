@@ -1,0 +1,18 @@
+type: object
+description: Error response body returned by the GlobalExceptionHandler.
+required:
+  - success
+  - message
+  - timestamp
+properties:
+  success:
+    type: boolean
+    example: false
+  message:
+    type: string
+    description: Error description.
+    example: "Resource not found"
+  timestamp:
+    type: string
+    description: ISO 8601 timestamp.
+    example: "2026-04-01T17:00:00+07:00"

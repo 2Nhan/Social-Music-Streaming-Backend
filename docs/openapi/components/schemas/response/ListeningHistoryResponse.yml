@@ -1,0 +1,9 @@
+type: object
+properties:
+  id:
+    type: string
+  songId:
+    type: string
+  listenedAt:
+    type: string
+    description: ISO 8601 timestamp.

@@ -1,0 +1,7 @@
+type: object
+required:
+  - songId
+properties:
+  songId:
+    type: string
+    description: ID of the song to add to the playlist.

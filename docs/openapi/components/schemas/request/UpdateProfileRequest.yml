@@ -1,0 +1,8 @@
+type: object
+properties:
+  bio:
+    type: string
+    nullable: true
+  avatarUrl:
+    type: string
+    nullable: true

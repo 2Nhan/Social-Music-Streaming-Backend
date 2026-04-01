@@ -1,0 +1,6 @@
+type: string
+enum:
+  - PUBLIC
+  - PRIVATE
+description: Visibility of the resource.
+default: PUBLIC

@@ -1,0 +1,134 @@
+# History & Me endpoints from HistoryController
+# Base: /api/v1/users/me
+
+LogListen:
+  post:
+    tags: [History]
+    summary: Log a song listen event
+    operationId: logListen
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Listening history recorded.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+GetHistory:
+  get:
+    tags: [History]
+    summary: Get current user's listening history (paginated)
+    operationId: getHistory
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated listening history.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/ListeningHistoryResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+
+GetMyLikedSongs:
+  get:
+    tags: [History]
+    summary: Get current user's liked songs (paginated)
+    operationId: getMyLikedSongs
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      '200':
+        description: Paginated list of liked songs.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: '../components/schemas/response/LikeResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'

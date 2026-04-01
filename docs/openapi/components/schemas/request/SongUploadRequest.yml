@@ -1,0 +1,22 @@
+type: object
+required:
+  - title
+  - audioFile
+properties:
+  title:
+    type: string
+    description: Song title.
+  description:
+    type: string
+    nullable: true
+    description: Optional song description.
+  imageFile:
+    type: string
+    format: binary
+    description: Cover image file (optional).
+  audioFile:
+    type: string
+    format: binary
+    description: Audio file (MP3).
+  visibility:
+    $ref: '../response/Visibility.yml'

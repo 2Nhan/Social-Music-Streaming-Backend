@@ -1,0 +1,13 @@
+type: object
+required:
+  - name
+properties:
+  name:
+    type: string
+    description: Name of the playlist.
+  description:
+    type: string
+    nullable: true
+    description: Optional playlist description.
+  visibility:
+    $ref: '../response/Visibility.yml'

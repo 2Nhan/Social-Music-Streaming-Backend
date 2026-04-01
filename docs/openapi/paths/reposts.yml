@@ -1,0 +1,84 @@
+# Repost endpoints from RepostController
+
+SongRepost:
+  post:
+    tags: [Reposts]
+    summary: Repost a song
+    operationId: repost
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Reposted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '../components/schemas/response/RepostResponse.yml'
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '409':
+        description: Already reposted.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+  delete:
+    tags: [Reposts]
+    summary: Remove a repost
+    operationId: unrepost
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song ID.
+    responses:
+      '200':
+        description: Unreposted successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      '401':
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
+      '404':
+        description: Song or repost not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/response/ErrorResponse.yml'
