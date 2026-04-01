@@ -36,3 +36,9 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /micsu/docs/openapi.yml
