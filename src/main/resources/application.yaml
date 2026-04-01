@@ -38,7 +38,6 @@ jwt:
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION}
 
 springdoc:
-  api-docs:
-    enabled: false
   swagger-ui:
-    url: /micsu/docs/openapi.yml
+    disable-swagger-default-url: true
+    url: /docs/openapi.yml
