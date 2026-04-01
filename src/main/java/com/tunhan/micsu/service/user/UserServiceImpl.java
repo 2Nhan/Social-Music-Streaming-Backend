@@ -80,7 +80,6 @@ public class UserServiceImpl implements UserService {
                 .title(song.getTitle())
                 .description(song.getDescription())
                 .coverUrl(song.getCoverUrl())
-                .audioUrl(song.getAudioUrl())
                 .duration(song.getDuration())
                 .lyricsData(song.getLyricsData())
                 .favoriteCount(song.getFavoriteCount())
