@@ -12,6 +12,8 @@ info:
     name: TunHan
 
 servers:
+  - url: https://pj2.crmsoft.site
+    description: Production server
   - url: http://localhost:8081
     description: Local development server
 
