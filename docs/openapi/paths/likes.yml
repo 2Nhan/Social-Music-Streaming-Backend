@@ -1,10 +1,14 @@
 # Like endpoints from LikeController
-# Base: /api/v1/likes
 
 Like:
   post:
-    tags: [Likes]
+    tags: 
+      - Likes
     summary: Like a song or playlist
+    description: >-
+      Creates a formal "like" association between the authenticated user and a distinct target entity (A Song or a Playlist module).
+      Returns an HTTP 409 Conflict if attempting to duplicate a pre-existing like association.
+      Requires a valid JWT token.
     operationId: like
     security:
       - BearerAuth: []
@@ -16,7 +20,7 @@ Like:
             $ref: '../components/schemas/request/LikeRequest.yml'
     responses:
       '200':
-        description: Liked successfully.
+        description: Target successfully liked.
         content:
           application/json:
             schema:
@@ -27,25 +31,25 @@ Like:
                     data:
                       $ref: '../components/schemas/response/LikeResponse.yml'
       '400':
-        description: Validation failed.
+        description: Request validation failed.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Intercepted - Unauthenticated.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Target entity not found.
+        description: Target mapping entity not localized.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '409':
-        description: Already liked.
+        description: Conflict overlap — Target asset already bears user's like.
         content:
           application/json:
             schema:
@@ -53,8 +57,13 @@ Like:
 
 Unlike:
   delete:
-    tags: [Likes]
-    summary: Unlike (remove a like)
+    tags: 
+      - Likes
+    summary: Remove a like from an entity
+    description: >-
+      Severs and removes an existing like alignment from a specific song or playlist index. 
+      The authenticated entity context can solely detach the likes originating from themselves. 
+      Requires a valid JWT payload.
     operationId: unlike
     security:
       - BearerAuth: []
@@ -64,10 +73,10 @@ Unlike:
         required: true
         schema:
           type: string
-        description: Like ID.
+        description: Canonical Like UUID or corresponding index ID.
     responses:
       '200':
-        description: Unliked successfully.
+        description: Like effectively reversed.
         content:
           application/json:
             schema:
@@ -79,19 +88,19 @@ Unlike:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Verification framework block — Unauthenticated.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the like owner.
+        description: Blocked — Action originator is not the like entity anchor.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Like not found.
+        description: Specified like entity could not be traced.
         content:
           application/json:
             schema:

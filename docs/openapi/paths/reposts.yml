@@ -2,8 +2,13 @@
 
 SongRepost:
   post:
-    tags: [Reposts]
-    summary: Repost a song
+    tags: 
+      - Reposts
+    summary: Repost a song to user profile
+    description: >-
+      Creates a repost record allowing the authenticated user to share a song on their profile. 
+      Returns an HTTP 409 Conflict if the song is already reposted. 
+      Requires a valid JWT token.
     operationId: repost
     security:
       - BearerAuth: []
@@ -13,7 +18,7 @@ SongRepost:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: Target song ID to repost.
     responses:
       '200':
         description: Reposted successfully.
@@ -45,8 +50,13 @@ SongRepost:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   delete:
-    tags: [Reposts]
-    summary: Remove a repost
+    tags: 
+      - Reposts
+    summary: Remove a song repost
+    description: >-
+      Deletes an existing repost record, removing the song from the user's reposted collection.
+      Only the authenticated user who reposted the song can remove it.
+      Requires a valid JWT token.
     operationId: unrepost
     security:
       - BearerAuth: []
@@ -56,7 +66,7 @@ SongRepost:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: Target song ID to remove repost.
     responses:
       '200':
         description: Unreposted successfully.
@@ -77,7 +87,7 @@ SongRepost:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Song or repost not found.
+        description: Target song or repost record not found.
         content:
           application/json:
             schema:

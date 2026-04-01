@@ -2,8 +2,13 @@
 
 FollowUser:
   post:
-    tags: [Follow]
-    summary: Follow a user
+    tags: 
+      - Follow
+    summary: Follow a specific user
+    description: >-
+      Establishes a unidirectional following linkage where the currently authenticated profile engages a 'follow' upon a distinct target destination user. 
+      Fires a 409 Conflict rejection if the link state has previously been established. 
+      Requires valid JWT session data.
     operationId: followUser
     security:
       - BearerAuth: []
@@ -13,10 +18,10 @@ FollowUser:
         required: true
         schema:
           type: string
-        description: ID of the user to follow.
+        description: ID index mapping to the destination profile to follow.
     responses:
       '200':
-        description: Followed user successfully.
+        description: User profile successfully followed.
         content:
           application/json:
             schema:
@@ -28,26 +33,30 @@ FollowUser:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Session absent or broken.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: User not found.
+        description: Assumed destination user lookup failed.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '409':
-        description: Already following this user.
+        description: Status rejection - relationship constraint already existing.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   delete:
-    tags: [Follow]
-    summary: Unfollow a user
+    tags: 
+      - Follow
+    summary: Unfollow a specific user
+    description: >-
+      Removes the tracking link bridging the authenticated source user and a specific distinct outbound user account. 
+      Requires valid JWT authorization scope.
     operationId: unfollowUser
     security:
       - BearerAuth: []
@@ -57,10 +66,10 @@ FollowUser:
         required: true
         schema:
           type: string
-        description: ID of the user to unfollow.
+        description: ID footprint indexing the user being unfollowed.
     responses:
       '200':
-        description: Unfollowed user successfully.
+        description: Target profile no longer actively followed.
         content:
           application/json:
             schema:
@@ -72,13 +81,13 @@ FollowUser:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Intercept protocol - invalid authentication parameter.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: User or follow relationship not found.
+        description: System cannot locate user matrix or preexisting link element to discard.
         content:
           application/json:
             schema:

@@ -2,8 +2,12 @@
 
 UserById:
   get:
-    tags: [Users]
-    summary: Get user profile by ID
+    tags: 
+      - Users
+    summary: Retrieve public user profile
+    description: >-
+      Fetches the public profile details of a user, including counts of followers, following, and public playlists.
+      Does not require authentication.
     operationId: getUserById
     parameters:
       - in: path
@@ -11,10 +15,10 @@ UserById:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
     responses:
       '200':
-        description: User profile.
+        description: User profile successfully retrieved.
         content:
           application/json:
             schema:
@@ -31,8 +35,13 @@ UserById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   put:
-    tags: [Users]
-    summary: Update user profile
+    tags: 
+      - Users
+    summary: Update user public profile
+    description: >-
+      Modifies user profile attributes such as display name, avatar, and background image. 
+      Only the authenticated user is permitted to update their own profile. 
+      Requires a valid JWT token.
     operationId: updateProfile
     security:
       - BearerAuth: []
@@ -42,7 +51,7 @@ UserById:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
     requestBody:
       required: true
       content:
@@ -68,7 +77,7 @@ UserById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the profile owner.
+        description: Access denied — not the assigned profile owner.
         content:
           application/json:
             schema:
@@ -82,8 +91,13 @@ UserById:
 
 UserSongs:
   get:
-    tags: [Users]
-    summary: Get a user's songs (paginated)
+    tags: 
+      - Users
+    summary: List a user's uploaded songs
+    description: >-
+      Retrieves a paginated list of all valid songs explicitly uploaded by a specific user. 
+      Supports customizable sorting (e.g., sort by latest upload or most plays). 
+      Public endpoint, no authentication required.
     operationId: getUserSongs
     parameters:
       - in: path
@@ -91,27 +105,27 @@ UserSongs:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of items rendered per page.
       - in: query
         name: sort
         schema:
           type: string
           default: 'createdAt,desc'
         description: >-
-          Sort field and direction. Format: `field,direction`
-          (e.g. `createdAt,desc` or `title,asc`).
+          Sort field and operational direction. Format: `field,direction`
+          (e.g., `createdAt,desc` or `title,asc`).
     responses:
       '200':
         description: Paginated list of user's songs.
@@ -132,7 +146,7 @@ UserSongs:
                               items:
                                 $ref: '../components/schemas/response/SongDetailResponse.yml'
       '404':
-        description: User not found.
+        description: Subject User not found.
         content:
           application/json:
             schema:
@@ -140,8 +154,12 @@ UserSongs:
 
 UserFollowers:
   get:
-    tags: [Users]
-    summary: Get a user's followers (paginated)
+    tags: 
+      - Users
+    summary: List users following the target user
+    description: >-
+      Retrieves a paginated collection of all public user profiles that are actively following the specified user.
+      Public endpoint, no authentication required.
     operationId: getFollowers
     parameters:
       - in: path
@@ -149,19 +167,19 @@ UserFollowers:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of items rendered per page.
     responses:
       '200':
         description: Paginated list of followers.
@@ -182,7 +200,7 @@ UserFollowers:
                               items:
                                 $ref: '../components/schemas/response/UserProfileResponse.yml'
       '404':
-        description: User not found.
+        description: Subject User not found.
         content:
           application/json:
             schema:
@@ -190,8 +208,12 @@ UserFollowers:
 
 UserFollowing:
   get:
-    tags: [Users]
-    summary: Get users that a user is following (paginated)
+    tags: 
+      - Users
+    summary: List users the target user is following
+    description: >-
+      Retrieves a paginated list of all public profiles that the specified user officially follows.
+      Public endpoint, no authentication required.
     operationId: getFollowing
     parameters:
       - in: path
@@ -199,19 +221,19 @@ UserFollowing:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of items rendered per page.
     responses:
       '200':
         description: Paginated list of followed users.
@@ -232,7 +254,7 @@ UserFollowing:
                               items:
                                 $ref: '../components/schemas/response/UserProfileResponse.yml'
       '404':
-        description: User not found.
+        description: Subject User not found.
         content:
           application/json:
             schema:
@@ -240,8 +262,12 @@ UserFollowing:
 
 UserLikes:
   get:
-    tags: [Users]
-    summary: Get a user's likes (paginated)
+    tags: 
+      - Users
+    summary: List all entities liked by the user
+    description: >-
+      Retrieves a chronological, paginated directory of all songs and playlists that the specified user has actively liked.
+      Public endpoint, no authentication required.
     operationId: getUserLikes
     parameters:
       - in: path
@@ -249,22 +275,22 @@ UserLikes:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of items rendered per page.
     responses:
       '200':
-        description: Paginated list of user's likes.
+        description: Paginated list of user's liked content elements.
         content:
           application/json:
             schema:
@@ -282,7 +308,7 @@ UserLikes:
                               items:
                                 $ref: '../components/schemas/response/LikeResponse.yml'
       '404':
-        description: User not found.
+        description: Subject User not found.
         content:
           application/json:
             schema:
@@ -290,8 +316,12 @@ UserLikes:
 
 UserReposts:
   get:
-    tags: [Users]
-    summary: Get a user's reposts (paginated)
+    tags: 
+      - Users
+    summary: List all songs reposted by the user
+    description: >-
+      Retrieves a paginated chronological list of all standard songs that the specified user has pinned/reposted to their active feed profile.
+      Public endpoint, no authentication required.
     operationId: getUserReposts
     parameters:
       - in: path
@@ -299,22 +329,22 @@ UserReposts:
         required: true
         schema:
           type: string
-        description: User ID.
+        description: Targeted User ID.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of items rendered per page.
     responses:
       '200':
-        description: Paginated list of user's reposts.
+        description: Paginated list of user's reposted arrays.
         content:
           application/json:
             schema:
@@ -332,7 +362,7 @@ UserReposts:
                               items:
                                 $ref: '../components/schemas/response/RepostResponse.yml'
       '404':
-        description: User not found.
+        description: Subject User not found.
         content:
           application/json:
             schema:

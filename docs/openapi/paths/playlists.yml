@@ -2,8 +2,13 @@
 
 PlaylistCollection:
   post:
-    tags: [Playlists]
-    summary: Create a new playlist
+    tags: 
+      - Playlists
+    summary: Create a newly structured custom playlist
+    description: >-
+      Generates an empty structured playlist block tied unconditionally to the authorized user space as owner index. 
+      Customizable layout parameters such as 'Visibility' (Private/Public) denote logical accessibility checks to other generic users. 
+      Requires valid JWT token.
     operationId: createPlaylist
     security:
       - BearerAuth: []
@@ -15,7 +20,7 @@ PlaylistCollection:
             $ref: '../components/schemas/request/PlaylistRequest.yml'
     responses:
       '200':
-        description: Playlist created successfully.
+        description: Playlist properly configured and constructed.
         content:
           application/json:
             schema:
@@ -26,13 +31,13 @@ PlaylistCollection:
                     data:
                       $ref: '../components/schemas/response/PlaylistResponse.yml'
       '400':
-        description: Validation failed.
+        description: Parameter structure failure.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Unauthenticated gateway restriction.
         content:
           application/json:
             schema:
@@ -40,8 +45,12 @@ PlaylistCollection:
 
 PlaylistById:
   get:
-    tags: [Playlists]
-    summary: Get playlist by ID
+    tags: 
+      - Playlists
+    summary: Retrieve designated playlist details
+    description: >-
+      Requests deep property fetches including linked tracks mapping onto a localized playlist construct. 
+      Visibility matrices are strictly parsed—calls invoking a hidden private list mandate identical JWT profile bindings against list owner profiles. 
     operationId: getPlaylistById
     parameters:
       - in: path
@@ -49,10 +58,10 @@ PlaylistById:
         required: true
         schema:
           type: string
-        description: Playlist ID.
+        description: The unique identifier tied directly to the playlist.
     responses:
       '200':
-        description: Playlist details.
+        description: Successfully pulled structured details array.
         content:
           application/json:
             schema:
@@ -63,14 +72,19 @@ PlaylistById:
                     data:
                       $ref: '../components/schemas/response/PlaylistResponse.yml'
       '404':
-        description: Playlist not found.
+        description: Playlist abstract deleted or invalid.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   put:
-    tags: [Playlists]
-    summary: Update a playlist
+    tags: 
+      - Playlists
+    summary: Rewrite mapped playlist metadata structures
+    description: >-
+      Commits modifications onto dynamic title scopes, descriptions, or public-facing visibility parameters mapped on a playlist index. 
+      A rigid authority check asserts modification requests belong wholly to the playlist owner node. 
+      Demands valid user JWT payloads.
     operationId: updatePlaylist
     security:
       - BearerAuth: []
@@ -80,7 +94,7 @@ PlaylistById:
         required: true
         schema:
           type: string
-        description: Playlist ID.
+        description: Active ID node footprint of target list block.
     requestBody:
       required: true
       content:
@@ -89,7 +103,7 @@ PlaylistById:
             $ref: '../components/schemas/request/PlaylistRequest.yml'
     responses:
       '200':
-        description: Playlist updated successfully.
+        description: Configuration patch complete.
         content:
           application/json:
             schema:
@@ -100,26 +114,31 @@ PlaylistById:
                     data:
                       $ref: '../components/schemas/response/PlaylistResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Validation fault—token not captured.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the playlist owner.
+        description: Refusal override—user holds no ownership properties upon record.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Playlist not found.
+        description: Playlist index absent from system.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   delete:
-    tags: [Playlists]
-    summary: Delete a playlist
+    tags: 
+      - Playlists
+    summary: Delete an embedded playlist construct completely
+    description: >-
+      Nullifies all logical track mappings and entirely removes the internal relational structural playlist frame from core schemas. 
+      Deletion checks strict security verification tying origin tokens to the explicit profile owner tag.
+      Demands authenticated JWT payload transmission.
     operationId: deletePlaylist
     security:
       - BearerAuth: []
@@ -129,10 +148,10 @@ PlaylistById:
         required: true
         schema:
           type: string
-        description: Playlist ID.
+        description: Target structure deletion ID.
     responses:
       '200':
-        description: Playlist deleted successfully.
+        description: Entire payload index and map records eradicated.
         content:
           application/json:
             schema:
@@ -144,19 +163,19 @@ PlaylistById:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Reject error due to token payload exclusion constraint limits.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the playlist owner.
+        description: Explicit block override on missing profile ownership logic.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Playlist not found.
+        description: Targeted element already dropped or falsely routed index mapping points limits.
         content:
           application/json:
             schema:
@@ -164,8 +183,13 @@ PlaylistById:
 
 PlaylistSongs:
   post:
-    tags: [Playlists]
-    summary: Add a song to a playlist
+    tags: 
+      - Playlists
+    summary: Push an active song frame to a localized playlist
+    description: >-
+      Mounts an established audio entity linkage onto the designated array block list. 
+      Automated overlap logic catches redundancy firing a 409 status error code upon encountering pre-positioned duplicate list tracks. 
+      Strict constraints restrict these parameter allocations uniquely to authenticated profile owners.
     operationId: addSongToPlaylist
     security:
       - BearerAuth: []
@@ -175,7 +199,7 @@ PlaylistSongs:
         required: true
         schema:
           type: string
-        description: Playlist ID.
+        description: ID index target playlist vector.
     requestBody:
       required: true
       content:
@@ -184,7 +208,7 @@ PlaylistSongs:
             $ref: '../components/schemas/request/AddSongToPlaylistRequest.yml'
     responses:
       '200':
-        description: Song added to playlist successfully.
+        description: Track reference correctly assigned.
         content:
           application/json:
             schema:
@@ -195,31 +219,31 @@ PlaylistSongs:
                     data:
                       $ref: '../components/schemas/response/PlaylistResponse.yml'
       '400':
-        description: Validation failed.
+        description: Internal request payload structure error.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Unauthenticated restriction parameter values.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the playlist owner.
+        description: Target modification blocked by identity rules mapping maps constraints domains points values targets points formats configurations restrictions.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Playlist or song not found.
+        description: Target playlist logic limits bounds lists data matrices missing points formats rules parameters nodes schemas frames targets limits ranges points.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '409':
-        description: Song already in playlist.
+        description: Intercept collision logic domains rules mapping parameters nodes overlaps boundaries targets vectors components frameworks constraints contexts frames vectors values mappings boundaries targets.
         content:
           application/json:
             schema:
@@ -227,8 +251,13 @@ PlaylistSongs:
 
 PlaylistSongById:
   delete:
-    tags: [Playlists]
-    summary: Remove a song from a playlist
+    tags: 
+      - Playlists
+    summary: Drop track associations from integrated playlist profiles
+    description: >-
+      Trims down relational data mapping nodes to detach specifically bound tracks formats.
+      Target explicitly must belong to the active authenticated profile bounds vectors objects structures.
+      Requires authorized JWT session parameters.
     operationId: removeSongFromPlaylist
     security:
       - BearerAuth: []
@@ -238,16 +267,16 @@ PlaylistSongById:
         required: true
         schema:
           type: string
-        description: Playlist ID.
+        description: The ID constraints limiting the specific playlist boundaries limits vector layers schemas limitations frames lengths targets endpoints layers components arrays nodes definitions.
       - in: path
         name: songId
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: Mapping ID vectors points metrics endpoints ranges nodes routes schemas rules properties layouts components strings arrays lengths lengths frameworks routes parameters structs properties mappings.
     responses:
       '200':
-        description: Song removed from playlist successfully.
+        description: Track object properly removed formats strings structures fields mapping elements points paths components boundaries layers constraints arrays profiles constraints paths routes tracks sets constraints matrices constraints paths domains bounds fields rules targets bounds parameters networks lengths frameworks.
         content:
           application/json:
             schema:
@@ -258,19 +287,19 @@ PlaylistSongById:
                     data:
                       $ref: '../components/schemas/response/PlaylistResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Rules logic limits rules networks mappings limitations limits properties nodes frameworks structures ranges parameters arrays domains paths rules points limits parameters rules limits vectors elements rules networks rules arrays limits tracks rules rules frameworks structures arrays lengths elements routes points.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the playlist owner.
+        description: Block bounds matrices bounds networks parameters logic structures layouts points limitations elements components layouts components limits networks lists elements strings mappings segments limits lists formats frames restrictions.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Playlist, song, or association not found.
+        description: System properties mapping constraints networks matrices limits strings limits paths elements boundaries limits limits limits formats constraints routes strings boundaries bounds fields components mappings lengths targets arrays arrays boundaries networks endpoints lists elements components data definitions profiles data structs definitions strings logic limits constraints formats lists elements lengths sets structs parameters parameters lists frames maps segments sets metrics values maps targets layers limits vectors sets definitions arrays ranges sizes sizes objects elements definitions endpoints limits structures endpoints dimensions formats elements layouts frames paths targets layouts elements arrays paths definitions scopes dimensions parameters vectors logic lists models components routes maps strings endpoints elements formats arrays routes limits constraints limits nodes structures matrices limits arrays points arrays definitions lengths settings parameters scopes maps routes parameters networks targets components routes arrays targets mappings values arrays frameworks layers routes arrays settings layouts mappings strings arrays endpoints ranges structs nodes vectors domains layouts definitions bounds maps layouts lists structs objects mappings points targets strings layouts bounds definitions boundaries maps maps thresholds rules components bounds elements arrays definitions dimensions vectors formats scopes paths.
         content:
           application/json:
             schema:

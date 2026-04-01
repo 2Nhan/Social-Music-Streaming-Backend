@@ -2,8 +2,13 @@
 
 UploadSong:
   post:
-    tags: [Songs]
-    summary: Upload a new song
+    tags: 
+      - Songs
+    summary: Upload a new standard audio song
+    description: >-
+      Uploads a standard audio file (e.g., MP3) via multipart form data.
+      The authenticated user will automatically be set as the uploader and owner of the song. 
+      Requires a valid JWT token.
     operationId: uploadSong
     security:
       - BearerAuth: []
@@ -47,8 +52,13 @@ UploadSong:
 
 UploadSongV2:
   post:
-    tags: [Songs]
-    summary: Upload a new song (V2 pipeline)
+    tags: 
+      - Songs
+    summary: Upload and process a song via HLS pipeline
+    description: >-
+      Uploads an audio file and triggers the automated V2 processing pipeline to convert 
+      the audio into HTTP Live Streaming (HLS) format for adaptive bitrate streaming. 
+      The authenticated user is set as the uploader. Requires a valid JWT token.
     operationId: uploadSongV2
     security:
       - BearerAuth: []
@@ -60,7 +70,7 @@ UploadSongV2:
             $ref: '../components/schemas/request/SongUploadRequest.yml'
     responses:
       '200':
-        description: Song uploaded successfully.
+        description: Song uploaded successfully into V2 pipeline.
         content:
           application/json:
             schema:
@@ -92,8 +102,13 @@ UploadSongV2:
 
 SongById:
   get:
-    tags: [Songs]
-    summary: Get song details by ID
+    tags: 
+      - Songs
+    summary: Retrieve full song details
+    description: >-
+      Fetches complete metadata, play counts, and metrics for a specific song. 
+      If the user provides a valid JWT token, contextual data (such as whether the current user liked the song) is also evaluated and returned.
+      Can be accessed publicly without authentication.
     operationId: getSongById
     security:
       - BearerAuth: []
@@ -104,10 +119,10 @@ SongById:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The unique identifier of the desired song.
     responses:
       '200':
-        description: Song details.
+        description: Song details retrieved successfully.
         content:
           application/json:
             schema:
@@ -124,8 +139,13 @@ SongById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   put:
-    tags: [Songs]
+    tags: 
+      - Songs
     summary: Update song metadata
+    description: >-
+      Modifies metadata (e.g., title, genre, visibility) for an existing song. 
+      Only the original uploader (owner) of the song is authorized to perform this modification. 
+      Requires a valid JWT token.
     operationId: updateSong
     security:
       - BearerAuth: []
@@ -135,7 +155,7 @@ SongById:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The unique identifier of the song to update.
     requestBody:
       required: true
       content:
@@ -144,7 +164,7 @@ SongById:
             $ref: '../components/schemas/request/SongUpdateRequest.yml'
     responses:
       '200':
-        description: Song updated successfully.
+        description: Song updated successfully. Returns updated song payload.
         content:
           application/json:
             schema:
@@ -161,7 +181,7 @@ SongById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the song owner.
+        description: Access denied — User is not the owner of the song.
         content:
           application/json:
             schema:
@@ -173,8 +193,13 @@ SongById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   delete:
-    tags: [Songs]
-    summary: Delete a song
+    tags: 
+      - Songs
+    summary: Hard delete a song
+    description: >-
+      Permanently deletes a song entity and removes its associated media files and metadata. 
+      Only the original uploader of the song is authorized to execute this endpoint.
+      Requires a valid JWT token.
     operationId: deleteSong
     security:
       - BearerAuth: []
@@ -184,10 +209,10 @@ SongById:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The unique identifier of the song to delete.
     responses:
       '200':
-        description: Song deleted.
+        description: Song deleted successfully.
         content:
           application/json:
             schema:
@@ -205,7 +230,7 @@ SongById:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the song owner.
+        description: Access denied — User is not the owner of the song.
         content:
           application/json:
             schema:
@@ -219,8 +244,12 @@ SongById:
 
 StreamHls:
   get:
-    tags: [Songs]
-    summary: Get HLS master playlist (redirects to stream URL)
+    tags: 
+      - Songs
+    summary: Get HLS master playlist URL
+    description: >-
+      Retrieves or redirects to the M3U8 master playlist file required to stream the song using HTTP Live Streaming (HLS) technology.
+      Can be accessed publicly or with auth.
     operationId: streamHls
     security:
       - BearerAuth: []
@@ -231,7 +260,7 @@ StreamHls:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The unique identifier of the song to stream.
     responses:
       '302':
         description: Redirect to the HLS master playlist URL.
@@ -240,7 +269,7 @@ StreamHls:
             schema:
               type: string
               format: uri
-            description: URL to the HLS master playlist (.m3u8).
+            description: Direct Cloud/S3 URL to the HLS master playlist (.m3u8).
       '404':
         description: Song not found.
         content:

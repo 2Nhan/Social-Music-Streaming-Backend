@@ -2,8 +2,12 @@
 
 SongComments:
   get:
-    tags: [Comments]
-    summary: Get paginated comments for a song
+    tags: 
+      - Comments
+    summary: Retrieve paginated comments for a song
+    description: >-
+      Fetches a paginated chronological array of comments associated with a specific song. 
+      Does not require authentication, but demands a valid song target ID.
     operationId: getSongComments
     security:
       - BearerAuth: []
@@ -14,22 +18,22 @@ SongComments:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The song ID for which to retrieve comments.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Number of comment items rendered per page.
     responses:
       '200':
-        description: Paginated list of comments.
+        description: Paginated list of target comments.
         content:
           application/json:
             schema:
@@ -47,14 +51,19 @@ SongComments:
                               items:
                                 $ref: '../components/schemas/response/CommentResponse.yml'
       '404':
-        description: Song not found.
+        description: Parent Song not found.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
   post:
-    tags: [Comments]
-    summary: Add a comment to a song
+    tags: 
+      - Comments
+    summary: Publish a new comment on a song
+    description: >-
+      Persists a new user-authored text comment against a specific song entity. 
+      The authenticated active user context is mapped directly as the comment author. 
+      Requires a valid JWT token.
     operationId: addComment
     security:
       - BearerAuth: []
@@ -64,7 +73,7 @@ SongComments:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: The destination song ID.
     requestBody:
       required: true
       content:
@@ -73,7 +82,7 @@ SongComments:
             $ref: '../components/schemas/request/CommentRequest.yml'
     responses:
       '200':
-        description: Comment added successfully.
+        description: Comment persisted and attached to song successfully.
         content:
           application/json:
             schema:
@@ -84,19 +93,19 @@ SongComments:
                     data:
                       $ref: '../components/schemas/response/CommentResponse.yml'
       '400':
-        description: Validation failed.
+        description: Validation framework failed - text payload constraints violated.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Unauthenticated request block.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Song not found.
+        description: Target song omitted or missing.
         content:
           application/json:
             schema:
@@ -104,8 +113,13 @@ SongComments:
 
 DeleteComment:
   delete:
-    tags: [Comments]
-    summary: Delete a comment
+    tags: 
+      - Comments
+    summary: Delete a specific comment
+    description: >-
+      Removes a comment record from the database. 
+      Only the author of the comment is administratively allowed to trigger this deletion procedure. 
+      Requires a valid JWT token.
     operationId: deleteComment
     security:
       - BearerAuth: []
@@ -115,7 +129,7 @@ DeleteComment:
         required: true
         schema:
           type: string
-        description: Comment ID.
+        description: Target specific Comment ID block.
     responses:
       '200':
         description: Comment deleted successfully.
@@ -130,19 +144,19 @@ DeleteComment:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Unauthenticated constraint violation.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '403':
-        description: Access denied — not the comment owner.
+        description: Access block trigger — actor is not the comment owner.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Comment not found.
+        description: Targeted comment record not discovered.
         content:
           application/json:
             schema:

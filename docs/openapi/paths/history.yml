@@ -3,8 +3,13 @@
 
 LogListen:
   post:
-    tags: [History]
-    summary: Log a song listen event
+    tags: 
+      - History
+    summary: Process and log a song listen event
+    description: >-
+      Records a verified listening event for a specific song played by the authenticated user. 
+      This endpoint powers play count aggregation and personal user history logs. 
+      Requires a valid JWT token.
     operationId: logListen
     security:
       - BearerAuth: []
@@ -14,10 +19,10 @@ LogListen:
         required: true
         schema:
           type: string
-        description: Song ID.
+        description: Accessed Song ID.
     responses:
       '200':
-        description: Listening history recorded.
+        description: Listening history actively logged and recorded.
         content:
           application/json:
             schema:
@@ -29,13 +34,13 @@ LogListen:
                       nullable: true
                       example: null
       '401':
-        description: Unauthenticated.
+        description: Unauthenticated logic block.
         content:
           application/json:
             schema:
               $ref: '../components/schemas/response/ErrorResponse.yml'
       '404':
-        description: Song not found.
+        description: Referenced Song trace failed.
         content:
           application/json:
             schema:
@@ -43,8 +48,12 @@ LogListen:
 
 GetHistory:
   get:
-    tags: [History]
-    summary: Get current user's listening history (paginated)
+    tags: 
+      - History
+    summary: Retrieve user's listening history
+    description: >-
+      Fetches a strictly private, paginated catalog of songs recently listened to by the active authenticated user context. 
+      Chronologically ordered. Requires a valid JWT token.
     operationId: getHistory
     security:
       - BearerAuth: []
@@ -54,16 +63,16 @@ GetHistory:
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Page number for pagination (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Item boundaries size elements.
     responses:
       '200':
-        description: Paginated listening history.
+        description: Paginated listening history stream.
         content:
           application/json:
             schema:
@@ -81,7 +90,7 @@ GetHistory:
                               items:
                                 $ref: '../components/schemas/response/ListeningHistoryResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Framework Unauthenticated Error payload restriction.
         content:
           application/json:
             schema:
@@ -89,8 +98,12 @@ GetHistory:
 
 GetMyLikedSongs:
   get:
-    tags: [History]
-    summary: Get current user's liked songs (paginated)
+    tags: 
+      - History
+    summary: Retrieve user's explicitly liked songs
+    description: >-
+      Fetches a private, secured paginated pool array of all active songs explicitly favorited uniformly by the authenticated user entity. 
+      Requires a valid JWT token constraint context.
     operationId: getMyLikedSongs
     security:
       - BearerAuth: []
@@ -100,16 +113,16 @@ GetMyLikedSongs:
         schema:
           type: integer
           default: 0
-        description: Page number (0-indexed).
+        description: Pagination page identifier.
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items per page.
+        description: Fixed elements cap.
     responses:
       '200':
-        description: Paginated list of liked songs.
+        description: Safely resolved paginated frame payload containing liked bounds list structures arrays definitions properties matrices variables records definitions structs routes segments maps lists components components mapping paths limits formats records frames metrics frameworks parameters lists lists components tracks networks layouts maps properties bounds values domains configurations components limits values elements nodes frames routes rules limits metrics dimensions matrices lists vectors blocks definitions definitions paths nodes ranges layouts limits rules sizes networks.
         content:
           application/json:
             schema:
@@ -127,7 +140,7 @@ GetMyLikedSongs:
                               items:
                                 $ref: '../components/schemas/response/LikeResponse.yml'
       '401':
-        description: Unauthenticated.
+        description: Context limits Unauthenticated payload settings properties parameters definitions bounds fields layers bounds formats targets arrays limits arrays parameters structures elements formats metrics structures sets.
         content:
           application/json:
             schema:

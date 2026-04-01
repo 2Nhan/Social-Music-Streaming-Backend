@@ -12,7 +12,7 @@ info:
     name: TunHan
 
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8081
     description: Local development server
 
 security:
@@ -52,8 +52,6 @@ paths:
   # ── Songs ─────────────────────────────────────────────────
   /api/v1/songs/upload:
     $ref: './paths/songs.yml#/UploadSong'
-  /api/v1/songs/uploadV2:
-    $ref: './paths/songs.yml#/UploadSongV2'
   /api/v1/songs/{id}:
     $ref: './paths/songs.yml#/SongById'
   /api/v1/songs/{songId}/stream/master.m3u8:
