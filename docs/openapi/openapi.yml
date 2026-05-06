@@ -9,13 +9,13 @@ info:
     listening history.
   version: 1.0.0
   contact:
-    name: TunHan
+    name: TuNhan
 
 servers:
+  - url: http://localhost:8081/micsu
+    description: Local development server
   - url: https://pj2.crmsoft.site/micsu
     description: Production server
-  - url: http://localhost:8081
-    description: Local development server
 
 security:
   - BearerAuth: []
@@ -25,10 +25,12 @@ tags:
     description: Registration, login, token refresh, and logout.
   - name: Songs
     description: Song upload, retrieval, update, deletion, and HLS streaming.
+  - name: Search
+    description: Song search and autocomplete.
   - name: Comments
     description: Song comments (add, list, delete).
   - name: Likes
-    description: Like/unlike songs and playlists.
+    description: Like songs.
   - name: Follow
     description: Follow/unfollow users.
   - name: Playlists
@@ -36,135 +38,137 @@ tags:
   - name: Reposts
     description: Repost/unrepost songs.
   - name: Users
-    description: User profiles, songs, followers, following, likes, reposts.
+    description: User profiles, songs, followers, following, and reposts.
   - name: History
-    description: Listening history and current user's liked songs.
+    description: Listening history.
 
 paths:
   # ── Auth ──────────────────────────────────────────────────
   /api/v1/auth/register:
-    $ref: './paths/auth.yml#/Register'
+    $ref: "./paths/auth.yml#/Register"
   /api/v1/auth/login:
-    $ref: './paths/auth.yml#/Login'
+    $ref: "./paths/auth.yml#/Login"
   /api/v1/auth/refresh:
-    $ref: './paths/auth.yml#/Refresh'
+    $ref: "./paths/auth.yml#/Refresh"
   /api/v1/auth/logout:
-    $ref: './paths/auth.yml#/Logout'
+    $ref: "./paths/auth.yml#/Logout"
 
   # ── Songs ─────────────────────────────────────────────────
+  /api/v1/songs:
+    $ref: "./paths/songs.yml#/SongsCollection"
   /api/v1/songs/upload:
-    $ref: './paths/songs.yml#/UploadSong'
+    $ref: "./paths/songs.yml#/UploadSong"
   /api/v1/songs/{id}:
-    $ref: './paths/songs.yml#/SongById'
+    $ref: "./paths/songs.yml#/SongById"
   /api/v1/songs/{songId}/stream/master.m3u8:
-    $ref: './paths/songs.yml#/StreamHls'
+    $ref: "./paths/songs.yml#/StreamHls"
+
+  # ── Search ────────────────────────────────────────────────
+  /api/v1/search:
+    $ref: "./paths/search.yml#/SearchResults"
+  /api/v1/search/autocomplete:
+    $ref: "./paths/search.yml#/AutocompleteSearch"
 
   # ── Comments ──────────────────────────────────────────────
   /api/v1/songs/{songId}/comments:
-    $ref: './paths/comments.yml#/SongComments'
+    $ref: "./paths/comments.yml#/SongComments"
   /api/v1/comments/{id}:
-    $ref: './paths/comments.yml#/DeleteComment'
+    $ref: "./paths/comments.yml#/DeleteComment"
 
   # ── Likes ─────────────────────────────────────────────────
-  /api/v1/likes:
-    $ref: './paths/likes.yml#/Like'
-  /api/v1/likes/{id}:
-    $ref: './paths/likes.yml#/Unlike'
+  /api/v1/likes/songs/{songId}:
+    $ref: "./paths/likes.yml#/Like"
 
   # ── Follow ────────────────────────────────────────────────
   /api/v1/follow/{userId}:
-    $ref: './paths/follow.yml#/FollowUser'
+    $ref: "./paths/follow.yml#/FollowUser"
 
   # ── Playlists ─────────────────────────────────────────────
   /api/v1/playlists:
-    $ref: './paths/playlists.yml#/PlaylistCollection'
+    $ref: "./paths/playlists.yml#/PlaylistCollection"
   /api/v1/playlists/{id}:
-    $ref: './paths/playlists.yml#/PlaylistById'
+    $ref: "./paths/playlists.yml#/PlaylistById"
   /api/v1/playlists/{id}/songs:
-    $ref: './paths/playlists.yml#/PlaylistSongs'
+    $ref: "./paths/playlists.yml#/PlaylistSongs"
   /api/v1/playlists/{id}/songs/{songId}:
-    $ref: './paths/playlists.yml#/PlaylistSongById'
+    $ref: "./paths/playlists.yml#/PlaylistSongById"
 
   # ── Reposts ───────────────────────────────────────────────
   /api/v1/songs/{songId}/repost:
-    $ref: './paths/reposts.yml#/SongRepost'
+    $ref: "./paths/reposts.yml#/SongRepost"
 
   # ── Users ─────────────────────────────────────────────────
   /api/v1/users/{id}:
-    $ref: './paths/users.yml#/UserById'
+    $ref: "./paths/users.yml#/UserById"
   /api/v1/users/{id}/songs:
-    $ref: './paths/users.yml#/UserSongs'
+    $ref: "./paths/users.yml#/UserSongs"
   /api/v1/users/{id}/followers:
-    $ref: './paths/users.yml#/UserFollowers'
+    $ref: "./paths/users.yml#/UserFollowers"
   /api/v1/users/{id}/following:
-    $ref: './paths/users.yml#/UserFollowing'
-  /api/v1/users/{id}/likes:
-    $ref: './paths/users.yml#/UserLikes'
+    $ref: "./paths/users.yml#/UserFollowing"
   /api/v1/users/{id}/reposts:
-    $ref: './paths/users.yml#/UserReposts'
+    $ref: "./paths/users.yml#/UserReposts"
 
   # ── History / Me ──────────────────────────────────────────
   /api/v1/users/me/history/{songId}:
-    $ref: './paths/history.yml#/LogListen'
+    $ref: "./paths/history.yml#/LogListen"
   /api/v1/users/me/history:
-    $ref: './paths/history.yml#/GetHistory'
-  /api/v1/users/me/likes:
-    $ref: './paths/history.yml#/GetMyLikedSongs'
+    $ref: "./paths/history.yml#/GetHistory"
 
 components:
   securitySchemes:
     BearerAuth:
-      $ref: './components/securitySchemes.yml#/BearerAuth'
+      $ref: "./components/securitySchemes.yml#/BearerAuth"
 
   schemas:
     # ── Request DTOs ──
     LoginRequest:
-      $ref: './components/schemas/request/LoginRequest.yml'
+      $ref: "./components/schemas/request/LoginRequest.yml"
     RegisterRequest:
-      $ref: './components/schemas/request/RegisterRequest.yml'
+      $ref: "./components/schemas/request/RegisterRequest.yml"
     RefreshTokenRequest:
-      $ref: './components/schemas/request/RefreshTokenRequest.yml'
+      $ref: "./components/schemas/request/RefreshTokenRequest.yml"
     CommentRequest:
-      $ref: './components/schemas/request/CommentRequest.yml'
-    LikeRequest:
-      $ref: './components/schemas/request/LikeRequest.yml'
+      $ref: "./components/schemas/request/CommentRequest.yml"
     PlaylistRequest:
-      $ref: './components/schemas/request/PlaylistRequest.yml'
+      $ref: "./components/schemas/request/PlaylistRequest.yml"
     AddSongToPlaylistRequest:
-      $ref: './components/schemas/request/AddSongToPlaylistRequest.yml'
+      $ref: "./components/schemas/request/AddSongToPlaylistRequest.yml"
     SongUploadRequest:
-      $ref: './components/schemas/request/SongUploadRequest.yml'
+      $ref: "./components/schemas/request/SongUploadRequest.yml"
     SongUpdateRequest:
-      $ref: './components/schemas/request/SongUpdateRequest.yml'
+      $ref: "./components/schemas/request/SongUpdateRequest.yml"
     UpdateProfileRequest:
-      $ref: './components/schemas/request/UpdateProfileRequest.yml'
+      $ref: "./components/schemas/request/UpdateProfileRequest.yml"
 
     # ── Response DTOs ──
     ApiResponse:
-      $ref: './components/schemas/response/ApiResponse.yml'
+      $ref: "./components/schemas/response/ApiResponse.yml"
     ErrorResponse:
-      $ref: './components/schemas/response/ErrorResponse.yml'
+      $ref: "./components/schemas/response/ErrorResponse.yml"
     AuthResponse:
-      $ref: './components/schemas/response/AuthResponse.yml'
+      $ref: "./components/schemas/response/AuthResponse.yml"
     CommentResponse:
-      $ref: './components/schemas/response/CommentResponse.yml'
+      $ref: "./components/schemas/response/CommentResponse.yml"
     LikeResponse:
-      $ref: './components/schemas/response/LikeResponse.yml'
+      $ref: "./components/schemas/response/LikeResponse.yml"
     PlaylistResponse:
-      $ref: './components/schemas/response/PlaylistResponse.yml'
+      $ref: "./components/schemas/response/PlaylistResponse.yml"
     RepostResponse:
-      $ref: './components/schemas/response/RepostResponse.yml'
+      $ref: "./components/schemas/response/RepostResponse.yml"
+    SongResponse:
+      $ref: "./components/schemas/response/SongResponse.yml"
     SongDetailResponse:
-      $ref: './components/schemas/response/SongDetailResponse.yml'
+      $ref: "./components/schemas/response/SongDetailResponse.yml"
     UserProfileResponse:
-      $ref: './components/schemas/response/UserProfileResponse.yml'
+      $ref: "./components/schemas/response/UserProfileResponse.yml"
     ListeningHistoryResponse:
-      $ref: './components/schemas/response/ListeningHistoryResponse.yml'
+      $ref: "./components/schemas/response/ListeningHistoryResponse.yml"
     PageResponse:
-      $ref: './components/schemas/response/PageResponse.yml'
+      $ref: "./components/schemas/response/PageResponse.yml"
 
     # ── Enums ──
     TargetType:
-      $ref: './components/schemas/response/TargetType.yml'
+      $ref: "./components/schemas/response/TargetType.yml"
     Visibility:
-      $ref: './components/schemas/response/Visibility.yml'
+      $ref: "./components/schemas/response/Visibility.yml"

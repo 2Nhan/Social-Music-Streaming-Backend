@@ -1,0 +1,48 @@
+# Thư mục: monitoring-stack/docker-compose.yml
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: standalone-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: standalone-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  mysql-exporter:
+    image: prom/mysqld-exporter:v0.19.0
+    container_name: mysql-exporter
+    restart: unless-stopped
+    command:
+      - --config.my-cnf=/etc/mysqld-exporter/.my.cnf
+    volumes:
+      - ./my.cnf:/etc/mysqld-exporter/.my.cnf:ro
+    ports:
+      - "9104:9104"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+
+volumes:
+  prometheus_data:
+  grafana_data:

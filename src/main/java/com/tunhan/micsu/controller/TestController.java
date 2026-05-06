@@ -3,6 +3,7 @@ package com.tunhan.micsu.controller;
 import com.tunhan.micsu.dto.request.SongUploadRequest;
 import com.tunhan.micsu.service.R2StorageService;
 import com.tunhan.micsu.service.hls.HlsService;
+import com.tunhan.micsu.service.like.LikeService;
 import com.tunhan.micsu.utils.HlsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,7 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.tunhan.micsu.dto.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 
+@Hidden
 @RestController
 @RequestMapping("/api")
 public class TestController {
@@ -23,16 +26,19 @@ public class TestController {
     private final HlsService hlsServiceV2;
     private final HlsService hlsServiceV3;
     private final R2StorageService r2StorageService;
+    private final LikeService likeService;
 
     @Autowired
     public TestController(@Qualifier("hlsServiceV1") HlsService hlsServiceV1,
             @Qualifier("hlsServiceV2") HlsService hlsServiceV2,
             @Qualifier("hlsServiceV3") HlsService hlsServiceV3,
-            R2StorageService r2StorageService) {
+            R2StorageService r2StorageService,
+                          LikeService likeService) {
         this.hlsServiceV1 = hlsServiceV1;
         this.hlsServiceV2 = hlsServiceV2;
         this.hlsServiceV3 = hlsServiceV3;
         this.r2StorageService = r2StorageService;
+        this.likeService = likeService;
     }
 
     @PostMapping("/v1/hls")
@@ -68,5 +74,11 @@ public class TestController {
     public ResponseEntity<ApiResponse<Void>> cleanBucket() {
         r2StorageService.deleteByPrefix("songs/");
         return ResponseEntity.ok(ApiResponse.success("Test data deleted from bucket", null));
+    }
+
+    @PostMapping("/test/atomic-update-likes/{songId}")
+    public ResponseEntity<ApiResponse<Void>> testConcurrentLikes(@PathVariable String songId) {
+        likeService.atomicUpdateLikeSong(songId);
+        return ResponseEntity.ok(ApiResponse.success("Concurrent like test completed", null));
     }
 }

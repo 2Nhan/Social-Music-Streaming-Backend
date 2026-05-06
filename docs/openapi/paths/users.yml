@@ -2,46 +2,40 @@
 
 UserById:
   get:
-    tags: 
-      - Users
-    summary: Retrieve public user profile
-    description: >-
-      Fetches the public profile details of a user, including counts of followers, following, and public playlists.
-      Does not require authentication.
+    tags: [Users]
+    summary: Get user profile by id
+    description: Retrieve a public user profile.
     operationId: getUserById
+    security: []
     parameters:
       - in: path
         name: id
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
     responses:
-      '200':
-        description: User profile successfully retrieved.
+      "200":
+        description: User profile retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/UserProfileResponse.yml'
-      '404':
+                      $ref: "../components/schemas/response/UserProfileResponse.yml"
+      "404":
         description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
   put:
-    tags: 
-      - Users
-    summary: Update user public profile
-    description: >-
-      Modifies user profile attributes such as display name, avatar, and background image. 
-      Only the authenticated user is permitted to update their own profile. 
-      Requires a valid JWT token.
+    tags: [Users]
+    summary: Update user profile
+    description: Update profile information of the authenticated user.
     operationId: updateProfile
     security:
       - BearerAuth: []
@@ -51,319 +45,254 @@ UserById:
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/request/UpdateProfileRequest.yml'
+            $ref: "../components/schemas/request/UpdateProfileRequest.yml"
     responses:
-      '200':
+      "200":
         description: Profile updated successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/UserProfileResponse.yml'
-      '401':
+                      $ref: "../components/schemas/response/UserProfileResponse.yml"
+      "401":
         description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '403':
-        description: Access denied — not the assigned profile owner.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "403":
+        description: Access denied.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
         description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 UserSongs:
   get:
-    tags: 
-      - Users
-    summary: List a user's uploaded songs
-    description: >-
-      Retrieves a paginated list of all valid songs explicitly uploaded by a specific user. 
-      Supports customizable sorting (e.g., sort by latest upload or most plays). 
-      Public endpoint, no authentication required.
+    tags: [Users]
+    summary: Get songs uploaded by user
+    description: Retrieve songs uploaded by a user with pagination and sort.
     operationId: getUserSongs
+    security: []
     parameters:
       - in: path
         name: id
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number for pagination (0-indexed).
+        description: Page number (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items rendered per page.
+        description: Number of items per page.
       - in: query
         name: sort
         schema:
           type: string
-          default: 'createdAt,desc'
-        description: >-
-          Sort field and operational direction. Format: `field,direction`
-          (e.g., `createdAt,desc` or `title,asc`).
+          default: createdAt,desc
+        description: Sort format field,direction.
     responses:
-      '200':
-        description: Paginated list of user's songs.
+      "200":
+        description: User songs retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - $ref: "../components/schemas/response/PageResponse.yml"
                         - type: object
                           properties:
                             content:
                               type: array
                               items:
-                                $ref: '../components/schemas/response/SongDetailResponse.yml'
-      '404':
-        description: Subject User not found.
+                                $ref: "../components/schemas/response/SongResponse.yml"
+      "404":
+        description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 UserFollowers:
   get:
-    tags: 
-      - Users
-    summary: List users following the target user
-    description: >-
-      Retrieves a paginated collection of all public user profiles that are actively following the specified user.
-      Public endpoint, no authentication required.
+    tags: [Users]
+    summary: Get followers of user
+    description: Retrieve followers of a user.
     operationId: getFollowers
+    security: []
     parameters:
       - in: path
         name: id
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number for pagination (0-indexed).
+        description: Page number (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items rendered per page.
+        description: Number of items per page.
     responses:
-      '200':
-        description: Paginated list of followers.
+      "200":
+        description: Followers retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - $ref: "../components/schemas/response/PageResponse.yml"
                         - type: object
                           properties:
                             content:
                               type: array
                               items:
-                                $ref: '../components/schemas/response/UserProfileResponse.yml'
-      '404':
-        description: Subject User not found.
+                                $ref: "../components/schemas/response/UserProfileResponse.yml"
+      "404":
+        description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 UserFollowing:
   get:
-    tags: 
-      - Users
-    summary: List users the target user is following
-    description: >-
-      Retrieves a paginated list of all public profiles that the specified user officially follows.
-      Public endpoint, no authentication required.
+    tags: [Users]
+    summary: Get following users
+    description: Retrieve users followed by a user.
     operationId: getFollowing
+    security: []
     parameters:
       - in: path
         name: id
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number for pagination (0-indexed).
+        description: Page number (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items rendered per page.
+        description: Number of items per page.
     responses:
-      '200':
-        description: Paginated list of followed users.
+      "200":
+        description: Following users retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - $ref: "../components/schemas/response/PageResponse.yml"
                         - type: object
                           properties:
                             content:
                               type: array
                               items:
-                                $ref: '../components/schemas/response/UserProfileResponse.yml'
-      '404':
-        description: Subject User not found.
+                                $ref: "../components/schemas/response/UserProfileResponse.yml"
+      "404":
+        description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-
-UserLikes:
-  get:
-    tags: 
-      - Users
-    summary: List all entities liked by the user
-    description: >-
-      Retrieves a chronological, paginated directory of all songs and playlists that the specified user has actively liked.
-      Public endpoint, no authentication required.
-    operationId: getUserLikes
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: Targeted User ID.
-      - in: query
-        name: page
-        schema:
-          type: integer
-          default: 0
-        description: Page number for pagination (0-indexed).
-      - in: query
-        name: size
-        schema:
-          type: integer
-          default: 20
-        description: Number of items rendered per page.
-    responses:
-      '200':
-        description: Paginated list of user's liked content elements.
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
-                - type: object
-                  properties:
-                    data:
-                      allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
-                        - type: object
-                          properties:
-                            content:
-                              type: array
-                              items:
-                                $ref: '../components/schemas/response/LikeResponse.yml'
-      '404':
-        description: Subject User not found.
-        content:
-          application/json:
-            schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 UserReposts:
   get:
-    tags: 
-      - Users
-    summary: List all songs reposted by the user
-    description: >-
-      Retrieves a paginated chronological list of all standard songs that the specified user has pinned/reposted to their active feed profile.
-      Public endpoint, no authentication required.
+    tags: [Users]
+    summary: Get reposts of user
+    description: Retrieve reposted songs of a user.
     operationId: getUserReposts
+    security: []
     parameters:
       - in: path
         name: id
         required: true
         schema:
           type: string
-        description: Targeted User ID.
+        description: User id.
       - in: query
         name: page
         schema:
           type: integer
           default: 0
-        description: Page number for pagination (0-indexed).
+        description: Page number (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Number of items rendered per page.
+        description: Number of items per page.
     responses:
-      '200':
-        description: Paginated list of user's reposted arrays.
+      "200":
+        description: User reposts retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - $ref: "../components/schemas/response/PageResponse.yml"
                         - type: object
                           properties:
                             content:
                               type: array
                               items:
-                                $ref: '../components/schemas/response/RepostResponse.yml'
-      '404':
-        description: Subject User not found.
+                                $ref: "../components/schemas/response/RepostResponse.yml"
+      "404":
+        description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"

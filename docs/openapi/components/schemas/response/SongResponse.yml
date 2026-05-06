@@ -1,0 +1,37 @@
+type: object
+properties:
+  id:
+    type: string
+  title:
+    type: string
+  description:
+    type: string
+    nullable: true
+  coverUrl:
+    type: string
+    nullable: true
+  duration:
+    type: integer
+    format: int64
+  lyricsData:
+    type: string
+    nullable: true
+  favoriteCount:
+    type: integer
+    format: int64
+  viewCount:
+    type: integer
+    format: int64
+  repostCount:
+    type: integer
+    format: int64
+  visibility:
+    $ref: "./Visibility.yml"
+  uploadedBy:
+    type: string
+  createdAt:
+    type: string
+    description: ISO 8601 timestamp.
+  updatedAt:
+    type: string
+    description: ISO 8601 timestamp.

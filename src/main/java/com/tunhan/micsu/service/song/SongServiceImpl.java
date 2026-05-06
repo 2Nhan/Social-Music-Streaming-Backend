@@ -2,11 +2,13 @@ package com.tunhan.micsu.service.song;
 
 import com.tunhan.micsu.dto.request.SongUpdateRequest;
 import com.tunhan.micsu.dto.request.SongUploadRequest;
-import com.tunhan.micsu.dto.response.SongDetailResponse;
+import com.tunhan.micsu.dto.response.PageResponse;
+import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.entity.enums.Visibility;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
+import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import com.tunhan.micsu.service.R2StorageService;
@@ -15,8 +17,7 @@ import com.tunhan.micsu.utils.AudioMetadataUtil;
 import com.tunhan.micsu.utils.HlsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,18 +36,21 @@ public class SongServiceImpl implements SongService {
     private final R2StorageService r2StorageService;
     private final HlsService hlsServiceV3;
     private final HlsService hlsServiceV2;
+    private final SongMapper songMapper;
 
     public SongServiceImpl(
             SongRepository songRepository,
             UserRepository userRepository,
             R2StorageService r2StorageService,
             @Qualifier("hlsServiceV3") HlsService hlsServiceV3,
-            @Qualifier("hlsServiceV2") HlsService hlsServiceV2) {
+            @Qualifier("hlsServiceV2") HlsService hlsServiceV2,
+            SongMapper songMapper) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
         this.r2StorageService = r2StorageService;
         this.hlsServiceV3 = hlsServiceV3;
         this.hlsServiceV2 = hlsServiceV2;
+        this.songMapper = songMapper;
     }
 
     @Override
@@ -119,11 +123,22 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public SongDetailResponse getSongById(String id, String requesterId) {
+    public PageResponse<SongResponse> getAllSongs(Pageable pageable) {
+        var page = songRepository.findAll(pageable);
+        return PageResponse.<SongResponse>builder()
+                .content(page.getContent().stream().map(songMapper::toSongResponse).toList())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build();
+    }
+
+    @Override
+    public SongResponse getSongById(String id, String requesterId) {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Song", id));
         checkVisibility(song, requesterId);
-        return toDetailResponse(song);
+        return songMapper.toSongResponse(song);
     }
 
     @Override
@@ -138,7 +153,7 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public SongDetailResponse updateSong(String id, SongUpdateRequest request, String userId) {
+    public SongResponse updateSong(String id, SongUpdateRequest request, String userId) {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Song", id));
 
@@ -157,7 +172,7 @@ public class SongServiceImpl implements SongService {
 
         songRepository.save(song);
         log.info("[SongService] Updated song {}", id);
-        return toDetailResponse(song);
+        return songMapper.toSongResponse(song);
     }
 
     @Override
@@ -189,21 +204,4 @@ public class SongServiceImpl implements SongService {
         }
     }
 
-    private SongDetailResponse toDetailResponse(Song song) {
-        return SongDetailResponse.builder()
-                .id(song.getId())
-                .title(song.getTitle())
-                .description(song.getDescription())
-                .coverUrl(song.getCoverUrl())
-                .duration(song.getDuration())
-                .lyricsData(song.getLyricsData())
-                .favoriteCount(song.getFavoriteCount())
-                .viewCount(song.getViewCount())
-                .repostCount(song.getRepostCount())
-                .visibility(song.getVisibility())
-                .uploadedBy(song.getUploadedBy())
-                .createdAt(song.getCreatedAt() != null ? song.getCreatedAt().toString() : null)
-                .updatedAt(song.getUpdatedAt() != null ? song.getUpdatedAt().toString() : null)
-                .build();
-    }
 }

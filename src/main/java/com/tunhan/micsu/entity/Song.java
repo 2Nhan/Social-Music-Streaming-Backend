@@ -3,6 +3,7 @@ package com.tunhan.micsu.entity;
 import com.tunhan.micsu.entity.enums.Visibility;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Getter

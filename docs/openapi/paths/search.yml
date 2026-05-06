@@ -1,0 +1,76 @@
+# Search endpoints from SearchController
+
+SearchResults:
+  get:
+    tags: [Search]
+    summary: Search songs
+    description: Search songs by keyword with pagination.
+    operationId: searchResults
+    security: []
+    parameters:
+      - in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        description: Search keyword.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      "200":
+        description: Search results retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/SongResponse.yml"
+
+AutocompleteSearch:
+  get:
+    tags: [Search]
+    summary: Autocomplete search keyword
+    description: Return suggested search keywords.
+    operationId: autocompleteSearch
+    security: []
+    parameters:
+      - in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        description: Partial keyword.
+    responses:
+      "200":
+        description: Suggestions retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        type: string

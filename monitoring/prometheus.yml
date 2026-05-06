@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+
+  - job_name: 'spring-boot-music-app'
+    metrics_path: '/micsu/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8081']
+
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql-exporter:9104']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['host.docker.internal:9100']

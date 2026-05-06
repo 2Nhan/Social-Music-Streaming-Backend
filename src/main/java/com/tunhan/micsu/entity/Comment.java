@@ -2,6 +2,7 @@ package com.tunhan.micsu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,4 +41,8 @@ public class Comment extends BaseEntity {
      */
     @Column(name = "timestamp_in_song")
     private Long timestampInSong;
+
+    @Builder.Default
+    @Column(name = "favorite_count")
+    private Long favoriteCount = 0L;
 }

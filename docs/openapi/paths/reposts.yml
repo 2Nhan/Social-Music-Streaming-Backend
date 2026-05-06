@@ -2,13 +2,8 @@
 
 SongRepost:
   post:
-    tags: 
-      - Reposts
-    summary: Repost a song to user profile
-    description: >-
-      Creates a repost record allowing the authenticated user to share a song on their profile. 
-      Returns an HTTP 409 Conflict if the song is already reposted. 
-      Requires a valid JWT token.
+    tags: [Reposts]
+    summary: Repost a song
     operationId: repost
     security:
       - BearerAuth: []
@@ -18,45 +13,40 @@ SongRepost:
         required: true
         schema:
           type: string
-        description: Target song ID to repost.
+        description: Song id.
     responses:
-      '200':
+      "200":
         description: Reposted successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/RepostResponse.yml'
-      '401':
+                      $ref: "../components/schemas/response/RepostResponse.yml"
+      "401":
         description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
         description: Song not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '409':
-        description: Already reposted.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "409":
+        description: Song already reposted.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
   delete:
-    tags: 
-      - Reposts
-    summary: Remove a song repost
-    description: >-
-      Deletes an existing repost record, removing the song from the user's reposted collection.
-      Only the authenticated user who reposted the song can remove it.
-      Requires a valid JWT token.
+    tags: [Reposts]
+    summary: Remove repost of a song
     operationId: unrepost
     security:
       - BearerAuth: []
@@ -66,29 +56,29 @@ SongRepost:
         required: true
         schema:
           type: string
-        description: Target song ID to remove repost.
+        description: Song id.
     responses:
-      '200':
+      "200":
         description: Unreposted successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '401':
+      "401":
         description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
-        description: Target song or repost record not found.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: Song or repost not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"

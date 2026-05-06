@@ -1,106 +1,108 @@
 # Auth endpoints from AuthController
-# Base: /api/v1/auth
 
 Register:
   post:
     tags: [Auth]
     summary: Register a new user
     operationId: register
+    security: []
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/request/RegisterRequest.yml'
+            $ref: "../components/schemas/request/RegisterRequest.yml"
     responses:
-      '200':
+      "200":
         description: Registered successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/AuthResponse.yml'
-      '400':
+                      $ref: "../components/schemas/response/AuthResponse.yml"
+      "400":
         description: Validation failed.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '409':
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "409":
         description: Duplicate email or username.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 Login:
   post:
     tags: [Auth]
-    summary: Log in with email and password
+    summary: Log in
     operationId: login
+    security: []
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/request/LoginRequest.yml'
+            $ref: "../components/schemas/request/LoginRequest.yml"
     responses:
-      '200':
+      "200":
         description: Logged in successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/AuthResponse.yml'
-      '400':
+                      $ref: "../components/schemas/response/AuthResponse.yml"
+      "400":
         description: Validation failed.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 Refresh:
   post:
     tags: [Auth]
     summary: Refresh access token
-    operationId: refreshToken
+    operationId: refresh
+    security: []
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/request/RefreshTokenRequest.yml'
+            $ref: "../components/schemas/request/RefreshTokenRequest.yml"
     responses:
-      '200':
+      "200":
         description: Token refreshed.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
-                      $ref: '../components/schemas/response/AuthResponse.yml'
-      '400':
-        description: Validation failed or invalid refresh token.
+                      $ref: "../components/schemas/response/AuthResponse.yml"
+      "400":
+        description: Validation failed or refresh token invalid.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 Logout:
   post:
     tags: [Auth]
-    summary: Log out (invalidate tokens)
+    summary: Log out
     operationId: logout
     security:
       - BearerAuth: []
@@ -110,29 +112,29 @@ Logout:
         required: false
         schema:
           type: string
-        description: 'Bearer access token (optional). Format: `Bearer <token>`'
+        description: Bearer access token. Format Bearer <token>.
     requestBody:
       required: true
       content:
         application/json:
           schema:
-            $ref: '../components/schemas/request/RefreshTokenRequest.yml'
+            $ref: "../components/schemas/request/RefreshTokenRequest.yml"
     responses:
-      '200':
+      "200":
         description: Logged out successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '400':
+      "400":
         description: Validation failed.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"

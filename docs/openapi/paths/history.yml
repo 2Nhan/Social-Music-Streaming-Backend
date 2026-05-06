@@ -1,15 +1,10 @@
-# History & Me endpoints from HistoryController
-# Base: /api/v1/users/me
+# History endpoints from HistoryController
 
 LogListen:
   post:
-    tags: 
-      - History
-    summary: Process and log a song listen event
-    description: >-
-      Records a verified listening event for a specific song played by the authenticated user. 
-      This endpoint powers play count aggregation and personal user history logs. 
-      Requires a valid JWT token.
+    tags: [History]
+    summary: Log a listening event
+    description: Record that the authenticated user listened to a song.
     operationId: logListen
     security:
       - BearerAuth: []
@@ -19,41 +14,38 @@ LogListen:
         required: true
         schema:
           type: string
-        description: Accessed Song ID.
+        description: Song id.
     responses:
-      '200':
-        description: Listening history actively logged and recorded.
+      "200":
+        description: Listening history recorded.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '401':
-        description: Unauthenticated logic block.
+      "401":
+        description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
-        description: Referenced Song trace failed.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: Song not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
 
 GetHistory:
   get:
-    tags: 
-      - History
-    summary: Retrieve user's listening history
-    description: >-
-      Fetches a strictly private, paginated catalog of songs recently listened to by the active authenticated user context. 
-      Chronologically ordered. Requires a valid JWT token.
+    tags: [History]
+    summary: Get listening history
+    description: Retrieve the authenticated user's listening history.
     operationId: getHistory
     security:
       - BearerAuth: []
@@ -63,85 +55,35 @@ GetHistory:
         schema:
           type: integer
           default: 0
-        description: Page number for pagination (0-indexed).
+        description: Page number (0-indexed).
       - in: query
         name: size
         schema:
           type: integer
           default: 20
-        description: Item boundaries size elements.
+        description: Number of items per page.
     responses:
-      '200':
-        description: Paginated listening history stream.
+      "200":
+        description: Listening history retrieved successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
+                        - $ref: "../components/schemas/response/PageResponse.yml"
                         - type: object
                           properties:
                             content:
                               type: array
                               items:
-                                $ref: '../components/schemas/response/ListeningHistoryResponse.yml'
-      '401':
-        description: Framework Unauthenticated Error payload restriction.
+                                $ref: "../components/schemas/response/ListeningHistoryResponse.yml"
+      "401":
+        description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-
-GetMyLikedSongs:
-  get:
-    tags: 
-      - History
-    summary: Retrieve user's explicitly liked songs
-    description: >-
-      Fetches a private, secured paginated pool array of all active songs explicitly favorited uniformly by the authenticated user entity. 
-      Requires a valid JWT token constraint context.
-    operationId: getMyLikedSongs
-    security:
-      - BearerAuth: []
-    parameters:
-      - in: query
-        name: page
-        schema:
-          type: integer
-          default: 0
-        description: Pagination page identifier.
-      - in: query
-        name: size
-        schema:
-          type: integer
-          default: 20
-        description: Fixed elements cap.
-    responses:
-      '200':
-        description: Safely resolved paginated frame payload containing liked bounds list structures arrays definitions properties matrices variables records definitions structs routes segments maps lists components components mapping paths limits formats records frames metrics frameworks parameters lists lists components tracks networks layouts maps properties bounds values domains configurations components limits values elements nodes frames routes rules limits metrics dimensions matrices lists vectors blocks definitions definitions paths nodes ranges layouts limits rules sizes networks.
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
-                - type: object
-                  properties:
-                    data:
-                      allOf:
-                        - $ref: '../components/schemas/response/PageResponse.yml'
-                        - type: object
-                          properties:
-                            content:
-                              type: array
-                              items:
-                                $ref: '../components/schemas/response/LikeResponse.yml'
-      '401':
-        description: Context limits Unauthenticated payload settings properties parameters definitions bounds fields layers bounds formats targets arrays limits arrays parameters structures elements formats metrics structures sets.
-        content:
-          application/json:
-            schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"

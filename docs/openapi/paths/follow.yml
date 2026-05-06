@@ -2,13 +2,8 @@
 
 FollowUser:
   post:
-    tags: 
-      - Follow
-    summary: Follow a specific user
-    description: >-
-      Establishes a unidirectional following linkage where the currently authenticated profile engages a 'follow' upon a distinct target destination user. 
-      Fires a 409 Conflict rejection if the link state has previously been established. 
-      Requires valid JWT session data.
+    tags: [Follow]
+    summary: Follow a user
     operationId: followUser
     security:
       - BearerAuth: []
@@ -18,45 +13,41 @@ FollowUser:
         required: true
         schema:
           type: string
-        description: ID index mapping to the destination profile to follow.
+        description: User id to follow.
     responses:
-      '200':
-        description: User profile successfully followed.
+      "200":
+        description: Followed user successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '401':
-        description: Session absent or broken.
+      "401":
+        description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
-        description: Assumed destination user lookup failed.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: User not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '409':
-        description: Status rejection - relationship constraint already existing.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "409":
+        description: Already following this user.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"
   delete:
-    tags: 
-      - Follow
-    summary: Unfollow a specific user
-    description: >-
-      Removes the tracking link bridging the authenticated source user and a specific distinct outbound user account. 
-      Requires valid JWT authorization scope.
+    tags: [Follow]
+    summary: Unfollow a user
     operationId: unfollowUser
     security:
       - BearerAuth: []
@@ -66,29 +57,29 @@ FollowUser:
         required: true
         schema:
           type: string
-        description: ID footprint indexing the user being unfollowed.
+        description: User id to unfollow.
     responses:
-      '200':
-        description: Target profile no longer actively followed.
+      "200":
+        description: Unfollowed user successfully.
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '../components/schemas/response/ApiResponse.yml'
+                - $ref: "../components/schemas/response/ApiResponse.yml"
                 - type: object
                   properties:
                     data:
                       nullable: true
                       example: null
-      '401':
-        description: Intercept protocol - invalid authentication parameter.
+      "401":
+        description: Unauthenticated.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
-      '404':
-        description: System cannot locate user matrix or preexisting link element to discard.
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: User or follow relation not found.
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/response/ErrorResponse.yml'
+              $ref: "../components/schemas/response/ErrorResponse.yml"

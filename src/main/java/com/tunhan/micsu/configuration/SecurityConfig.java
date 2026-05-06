@@ -37,6 +37,7 @@ public class SecurityConfig {
                         // "/api/v1/hls", // TODO: remove after testing
                         // "/api/v2/hls", // TODO: remove after testing
                         // "/api/v3/hls" // TODO: remove after testing
+                        "/api/test/**",
         };
 
         private static final String[] PUBLIC_DELETE = {
@@ -44,23 +45,31 @@ public class SecurityConfig {
         };
 
         private static final String[] PUBLIC_GET = {
-                        "/api/v1/songs/{id}/**",
+                        "/api/v1/songs",
+                        "/api/v1/songs/*",
+                        "/api/v1/songs/*/stream/**",
+                        "/api/v1/search",
+                        "/api/v1/search/**",
                         "/api/v1/songs/*/comments",
-                        "/api/v1/users/{id}",
-                        "/api/v1/users/{id}/songs",
-                        "/api/v1/users/{id}/followers",
-                        "/api/v1/users/{id}/following",
-                        "/api/v1/users/{id}/likes",
-                        "/api/v1/users/{id}/reposts",
-                        "/api/v1/playlists/{id}",
+                        "/api/v1/users/*",
+                        "/api/v1/users/*/songs",
+                        "/api/v1/users/*/followers",
+                        "/api/v1/users/*/following",
+                        "/api/v1/users/*/reposts",
+                        "/api/v1/playlists/*",
                         // Swagger UI
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         // Static OpenAPI docs
-                        "/docs/**"
+                        "/docs/**",
+                        // Actuator
+                        "/actuator/**" // TODO: remove after testing
         };
 
+        private static final String[] PUBLIC_PATCH = {
+                "/api/v1/songs/{songId}/view" // TODO: remove after testing
+        };
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http.csrf(AbstractHttpConfigurer::disable);
@@ -70,6 +79,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, PUBLIC_POST).permitAll()
                                 .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
                                 .requestMatchers(HttpMethod.DELETE, PUBLIC_DELETE).permitAll()
+                                .requestMatchers(HttpMethod.PATCH, PUBLIC_PATCH).permitAll()
                                 .anyRequest().authenticated());
 
                 http.oauth2ResourceServer(oauth2 -> oauth2

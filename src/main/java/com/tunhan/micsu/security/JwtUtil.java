@@ -20,16 +20,14 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    /** Access token TTL in ms — default 15 minutes */
     @Value("${jwt.expiration:900000}")
     private long expiration;
 
-    /** Generates a short-lived access token (sub = userId) */
     public String generateAccessToken(String userId) {
         try {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(userId)
-                    .jwtID(UUID.randomUUID().toString()) // unique jti for blacklisting
+                    .jwtID(UUID.randomUUID().toString())
                     .issueTime(new Date())
                     .expirationTime(new Date(System.currentTimeMillis() + expiration))
                     .build();

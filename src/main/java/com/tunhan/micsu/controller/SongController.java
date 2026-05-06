@@ -3,9 +3,11 @@ package com.tunhan.micsu.controller;
 import com.tunhan.micsu.dto.request.SongUploadRequest;
 import com.tunhan.micsu.dto.request.SongUpdateRequest;
 import com.tunhan.micsu.dto.response.ApiResponse;
-import com.tunhan.micsu.dto.response.SongDetailResponse;
+import com.tunhan.micsu.dto.response.PageResponse;
+import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.service.song.SongService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -42,8 +44,15 @@ public class SongController {
         return ResponseEntity.ok(ApiResponse.success("Song uploaded successfully", null));
     }
 
+    @GetMapping("/songs")
+    public ResponseEntity<ApiResponse<PageResponse<SongResponse>>> getAllSongs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.success(songService.getAllSongs(PageRequest.of(page, size))));
+    }
+
     @GetMapping("/songs/{id}")
-    public ResponseEntity<ApiResponse<SongDetailResponse>> getSongById(
+    public ResponseEntity<ApiResponse<SongResponse>> getSongById(
             @PathVariable String id,
             @AuthenticationPrincipal Jwt jwt) {
         String requesterId = jwt != null ? jwt.getSubject() : null;
@@ -51,7 +60,7 @@ public class SongController {
     }
 
     @PutMapping("/songs/{id}")
-    public ResponseEntity<ApiResponse<SongDetailResponse>> updateSong(
+    public ResponseEntity<ApiResponse<SongResponse>> updateSong(
             @PathVariable String id,
             @RequestBody SongUpdateRequest request,
             @AuthenticationPrincipal Jwt jwt) {

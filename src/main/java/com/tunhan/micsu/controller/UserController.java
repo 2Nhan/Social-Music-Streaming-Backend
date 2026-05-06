@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/songs")
-    public ResponseEntity<ApiResponse<PageResponse<SongDetailResponse>>> getUserSongs(
+    public ResponseEntity<ApiResponse<PageResponse<SongResponse>>> getUserSongs(
             @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -65,15 +65,6 @@ public class UserController {
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(
                 followService.getFollowing(id, PageRequest.of(page, size))));
-    }
-
-    @GetMapping("/{id}/likes")
-    public ResponseEntity<ApiResponse<PageResponse<LikeResponse>>> getUserLikes(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(ApiResponse.success(likeService.getUserLikes(id, pageable)));
     }
 
     @GetMapping("/{id}/reposts")

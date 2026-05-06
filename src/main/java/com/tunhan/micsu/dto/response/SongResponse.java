@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SongDetailResponse {
+public class SongResponse {
     private String id;
     private String title;
     private String description;

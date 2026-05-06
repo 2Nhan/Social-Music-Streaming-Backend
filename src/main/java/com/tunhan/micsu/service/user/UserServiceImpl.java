@@ -2,12 +2,13 @@ package com.tunhan.micsu.service.user;
 
 import com.tunhan.micsu.dto.request.UpdateProfileRequest;
 import com.tunhan.micsu.dto.response.PageResponse;
-import com.tunhan.micsu.dto.response.SongDetailResponse;
+import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.dto.response.UserProfileResponse;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.entity.User;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
+import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final SongRepository songRepository;
+    private final SongMapper songMapper;
 
     @Override
     public UserProfileResponse getUserById(String id) {
@@ -50,10 +52,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<SongDetailResponse> getUserSongs(String userId, Pageable pageable) {
+    public PageResponse<SongResponse> getUserSongs(String userId, Pageable pageable) {
         Page<Song> page = songRepository.findByUploadedBy(userId, pageable);
-        return PageResponse.<SongDetailResponse>builder()
-                .content(page.getContent().stream().map(this::toSongResponse).toList())
+        return PageResponse.<SongResponse>builder()
+                .content(page.getContent().stream().map(songMapper::toSongResponse).toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
@@ -74,21 +76,4 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    private SongDetailResponse toSongResponse(Song song) {
-        return SongDetailResponse.builder()
-                .id(song.getId())
-                .title(song.getTitle())
-                .description(song.getDescription())
-                .coverUrl(song.getCoverUrl())
-                .duration(song.getDuration())
-                .lyricsData(song.getLyricsData())
-                .favoriteCount(song.getFavoriteCount())
-                .viewCount(song.getViewCount())
-                .repostCount(song.getRepostCount())
-                .visibility(song.getVisibility())
-                .uploadedBy(song.getUploadedBy())
-                .createdAt(song.getCreatedAt() != null ? song.getCreatedAt().toString() : null)
-                .updatedAt(song.getUpdatedAt() != null ? song.getUpdatedAt().toString() : null)
-                .build();
-    }
 }

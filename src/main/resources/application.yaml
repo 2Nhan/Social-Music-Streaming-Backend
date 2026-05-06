@@ -1,6 +1,11 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /micsu
+
 spring:
   application:
-    name: micsu
+    name: micsu-music-streaming-api
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -20,10 +25,22 @@ spring:
     multipart:
       max-file-size: 200MB
       max-request-size: 200MB
-server:
-  port: 8081
-  servlet:
-    context-path: /micsu
+
+management:
+  endpoints:
+    web:
+        exposure:
+            include: health,info,prometheus
+        metrics:
+          tags:
+            application: ${spring.application.name}
+  metrics:
+    distribution:
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+      percentiles-histogram:
+        http.server.requests: true
+
 storage:
   r2:
     accountId: ${R2_ACCOUNT_ID}
@@ -32,6 +49,7 @@ storage:
     mBucket: ${R2_BUCKET}
     endpoint: https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
     publicDomain: https://hi.crmsoft.site
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_ACCESS_EXPIRATION}
