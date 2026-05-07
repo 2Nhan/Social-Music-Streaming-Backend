@@ -13,6 +13,7 @@ import com.tunhan.micsu.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -23,6 +24,7 @@ public class LikeServiceImpl implements LikeService {
     private final SongRepository songRepository;
     private final SongFavoriteRepository songFavoriteRepository;
     private final SongMapper songMapper;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     @Transactional
@@ -49,5 +51,45 @@ public class LikeServiceImpl implements LikeService {
     @Transactional
     public void atomicUpdateLikeSong(String songId) {
         songRepository.incrementFavoriteCount(songId);
+    }
+
+    @Override
+    public void like(String songId, String userId) {
+        if(!redisLike(songId, userId)) {
+            log.warn("[LikeService] User {} already liked song {}", userId, songId);
+            throw new DuplicateResourceException("User has already liked this song");
+        }
+    }
+
+    @Override
+    public void unlike(String songId, String userId) {
+        if(!redisUnlike(songId, userId)) {
+            log.warn("[LikeService] User {} has not liked song {}", userId, songId);
+            throw new ResourceNotFoundException("User has not liked this song");
+        }
+    }
+
+    private boolean redisLike(String songId, String userId) {
+        String key = "likes:" + songId;
+        Long added = stringRedisTemplate.opsForSet().add(key, userId);
+        return added != null && added == 1L;
+    }
+
+    private boolean redisUnlike(String songId, String userId) {
+        String key = "likes:" + songId;
+        Long removed = stringRedisTemplate.opsForSet().remove(key, userId);
+        return removed != null && removed == 1L;
+    }
+
+    private long getLikeCount(String songId) {
+        String key = "likes:" + songId;
+        Long count = stringRedisTemplate.opsForSet().size(key);
+        return count != null ? count : 0L;
+    }
+
+    public boolean hasliked(String songId, String userId) {
+        String key = "likes:" + songId;
+        Boolean isMember = stringRedisTemplate.opsForSet().isMember(key, userId);
+        return Boolean.TRUE.equals(isMember);
     }
 }
