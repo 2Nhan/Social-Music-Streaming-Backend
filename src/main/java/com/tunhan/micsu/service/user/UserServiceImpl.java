@@ -9,6 +9,7 @@ import com.tunhan.micsu.entity.User;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.mapper.SongMapper;
+import com.tunhan.micsu.repository.SongFavoriteRepository;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import com.tunhan.micsu.service.R2StorageService;
@@ -19,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -27,6 +31,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final SongRepository songRepository;
+    private final SongFavoriteRepository songFavoriteRepository;
     private final SongMapper songMapper;
     private final R2StorageService r2StorageService;
 
@@ -57,10 +62,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<SongResponse> getUserSongs(String userId, Pageable pageable) {
+    public PageResponse<SongResponse> getUserSongs(String userId, Pageable pageable, String requesterId) {
         Page<Song> page = songRepository.findByUploadedBy(userId, pageable);
+
+        List<Song> songs = page.getContent();
+        Set<String> likedSongIds = requesterId != null && !songs.isEmpty()
+            ? songFavoriteRepository.findLikedSongIdsByUserIdAndSongIds(
+                requesterId,
+                songs.stream().map(Song::getId).toList())
+            : Collections.emptySet();
+
         return PageResponse.<SongResponse>builder()
-                .content(page.getContent().stream().map(songMapper::toSongResponse).toList())
+                .content(songs.stream()
+                        .map(song -> songMapper.toSongResponse(song,
+                                requesterId == null ? null : likedSongIds.contains(song.getId())))
+                        .toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())

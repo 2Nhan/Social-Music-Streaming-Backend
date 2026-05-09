@@ -8,5 +8,5 @@ import java.util.List;
 public interface SearchService {
     List<String> autocompletSearch(String query);
 
-    PageResponse<SongResponse> searchResults(String query, Pageable pageable);
+    PageResponse<SongResponse> searchResults(String query, Pageable pageable, String requesterId);
 }

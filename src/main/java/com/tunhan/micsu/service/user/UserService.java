@@ -13,5 +13,5 @@ public interface UserService {
 
     UserProfileResponse updateProfile(String id, UpdateProfileRequest request, String currentUserId) throws IOException;
 
-    PageResponse<SongResponse> getUserSongs(String userId, Pageable pageable);
+    PageResponse<SongResponse> getUserSongs(String userId, Pageable pageable, String requesterId);
 }

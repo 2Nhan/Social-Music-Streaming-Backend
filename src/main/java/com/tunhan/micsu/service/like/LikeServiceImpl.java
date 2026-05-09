@@ -46,7 +46,7 @@ public class LikeServiceImpl implements LikeService {
         songRepository.incrementFavoriteCount(songId);
         song.setFavoriteCount((song.getFavoriteCount() != null ? song.getFavoriteCount() : 0L) + 1);
 
-        return songMapper.toSongResponse(song);
+        return songMapper.toSongResponse(song, true);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class LikeServiceImpl implements LikeService {
         songRepository.decrementFavoriteCount(songId);
         song.setFavoriteCount(Math.max(0, (song.getFavoriteCount() != null ? song.getFavoriteCount() : 0L) - 1));
 
-        return songMapper.toSongResponse(song);
+        return songMapper.toSongResponse(song, false);
     }
 
     @Override

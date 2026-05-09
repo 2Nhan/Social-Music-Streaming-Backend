@@ -14,7 +14,7 @@ public interface SongService {
 
     void uploadSongV2(SongUploadRequest request) throws IOException;
 
-    PageResponse<SongResponse> getAllSongs(Pageable pageable);
+    PageResponse<SongResponse> getAllSongs(Pageable pageable, String requesterId);
 
     SongResponse getSongById(String id, String requesterId);
 

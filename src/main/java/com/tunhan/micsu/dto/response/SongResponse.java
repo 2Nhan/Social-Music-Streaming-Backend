@@ -17,6 +17,7 @@ public class SongResponse {
     private Long duration;
     private String lyricsData;
     private Long favoriteCount;
+    private Boolean isFavorited;
     private Long viewCount;
     private Long repostCount;
     private Visibility visibility;

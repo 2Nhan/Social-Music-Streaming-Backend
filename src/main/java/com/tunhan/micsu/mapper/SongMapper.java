@@ -17,6 +17,10 @@ public class SongMapper {
     private final GenreRepository genreRepository;
 
     public SongResponse toSongResponse(Song song) {
+        return toSongResponse(song, null);
+    }
+
+    public SongResponse toSongResponse(Song song, Boolean isFavorited) {
         User uploader = song.getUploadedBy() != null
                 ? userRepository.findById(song.getUploadedBy()).orElse(null)
                 : null;
@@ -32,6 +36,7 @@ public class SongMapper {
                 .duration(song.getDuration())
                 .lyricsData(song.getLyricsData())
                 .favoriteCount(song.getFavoriteCount())
+                .isFavorited(isFavorited)
                 .viewCount(song.getViewCount())
                 .repostCount(song.getRepostCount())
                 .visibility(song.getVisibility())

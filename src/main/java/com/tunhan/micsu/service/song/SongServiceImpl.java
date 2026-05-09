@@ -11,6 +11,7 @@ import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.GenreRepository;
+import com.tunhan.micsu.repository.SongFavoriteRepository;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import com.tunhan.micsu.service.R2StorageService;
@@ -26,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,6 +38,7 @@ import java.util.concurrent.CompletableFuture;
 public class SongServiceImpl implements SongService {
 
     private final SongRepository songRepository;
+    private final SongFavoriteRepository songFavoriteRepository;
     private final UserRepository userRepository;
     private final GenreRepository genreRepository;
     private final R2StorageService r2StorageService;
@@ -43,6 +48,7 @@ public class SongServiceImpl implements SongService {
 
     public SongServiceImpl(
             SongRepository songRepository,
+            SongFavoriteRepository songFavoriteRepository,
             UserRepository userRepository,
             GenreRepository genreRepository,
             R2StorageService r2StorageService,
@@ -50,6 +56,7 @@ public class SongServiceImpl implements SongService {
             @Qualifier("hlsServiceV2") HlsService hlsServiceV2,
             SongMapper songMapper) {
         this.songRepository = songRepository;
+        this.songFavoriteRepository = songFavoriteRepository;
         this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.r2StorageService = r2StorageService;
@@ -131,10 +138,21 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public PageResponse<SongResponse> getAllSongs(Pageable pageable) {
+    public PageResponse<SongResponse> getAllSongs(Pageable pageable, String requesterId) {
         var page = songRepository.findAll(pageable);
+
+        List<Song> songs = page.getContent();
+        Set<String> likedSongIds = requesterId != null && !songs.isEmpty()
+            ? songFavoriteRepository.findLikedSongIdsByUserIdAndSongIds(
+                requesterId,
+                songs.stream().map(Song::getId).toList())
+            : Collections.emptySet();
+
         return PageResponse.<SongResponse>builder()
-                .content(page.getContent().stream().map(songMapper::toSongResponse).toList())
+                .content(songs.stream()
+                        .map(song -> songMapper.toSongResponse(song,
+                                requesterId == null ? null : likedSongIds.contains(song.getId())))
+                        .toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
@@ -146,7 +164,10 @@ public class SongServiceImpl implements SongService {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Song", id));
         checkVisibility(song, requesterId);
-        return songMapper.toSongResponse(song);
+        Boolean isFavorited = requesterId == null
+            ? null
+            : songFavoriteRepository.existsByUserIdAndSongId(requesterId, song.getId());
+        return songMapper.toSongResponse(song, isFavorited);
     }
 
     @Override

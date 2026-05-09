@@ -49,9 +49,11 @@ public class UserController {
             @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort) {
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @AuthenticationPrincipal Jwt jwt) {
+        String requesterId = jwt != null ? jwt.getSubject() : null;
         return ResponseEntity.ok(ApiResponse.success(
-                userService.getUserSongs(id, buildPageable(page, size, sort))));
+            userService.getUserSongs(id, buildPageable(page, size, sort), requesterId)));
     }
 
     @GetMapping("/me/playlists")

@@ -10,5 +10,5 @@ import java.util.List;
 public interface GenreService {
     List<GenreResponse> getAllGenres();
 
-    PageResponse<SongResponse> getSongsByGenre(String genreId, Pageable pageable);
+    PageResponse<SongResponse> getSongsByGenre(String genreId, Pageable pageable, String requesterId);
 }

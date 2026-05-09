@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface SongFavoriteRepository extends JpaRepository<SongFavorite, String> {
@@ -22,4 +23,12 @@ public interface SongFavoriteRepository extends JpaRepository<SongFavorite, Stri
      */
     @Query("SELECT sf FROM SongFavorite sf WHERE sf.song.id = :songId")
     List<SongFavorite> findBySongId(@Param("songId") String songId);
+
+    @Query("""
+            SELECT sf.song.id
+            FROM SongFavorite sf
+            WHERE sf.user.id = :userId AND sf.song.id IN :songIds
+            """)
+    Set<String> findLikedSongIdsByUserIdAndSongIds(@Param("userId") String userId,
+                                                   @Param("songIds") List<String> songIds);
 }
