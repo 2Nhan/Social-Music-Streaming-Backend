@@ -20,3 +20,9 @@ properties:
   createdAt:
     type: string
     description: ISO 8601 timestamp.
+  songs:
+    type: array
+    nullable: true
+    description: Songs in the playlist. Returned by get playlist by id.
+    items:
+      $ref: './SongResponse.yml'

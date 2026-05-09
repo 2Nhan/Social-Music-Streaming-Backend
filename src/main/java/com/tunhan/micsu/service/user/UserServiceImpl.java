@@ -11,11 +11,14 @@ import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
+import com.tunhan.micsu.service.R2StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Slf4j
 @Service
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final SongRepository songRepository;
     private final SongMapper songMapper;
+    private final R2StorageService r2StorageService;
 
     @Override
     public UserProfileResponse getUserById(String id) {
@@ -34,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileResponse updateProfile(String id, UpdateProfileRequest request, String currentUserId) {
+    public UserProfileResponse updateProfile(String id, UpdateProfileRequest request, String currentUserId) throws IOException {
         if (!id.equals(currentUserId)) {
             throw new AccessDeniedException("You can only edit your own profile");
         }
@@ -43,8 +47,9 @@ public class UserServiceImpl implements UserService {
 
         if (request.getBio() != null)
             user.setBio(request.getBio());
-        if (request.getAvatarUrl() != null)
-            user.setAvatarUrl(request.getAvatarUrl());
+        if (request.getAvatarFile() != null && !request.getAvatarFile().isEmpty()) {
+            user.setAvatarUrl(r2StorageService.uploadAvatar(request.getAvatarFile(), id));
+        }
 
         userRepository.save(user);
         log.info("[UserService] Updated profile for user: {}", id);

@@ -20,6 +20,8 @@ public class SongResponse {
     private Long repostCount;
     private Visibility visibility;
     private String uploadedBy;
+    private String uploaderUsername;
+    private String uploaderAvatarUrl;
     private String createdAt;
     private String updatedAt;
 }

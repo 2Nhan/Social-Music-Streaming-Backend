@@ -1,0 +1,6 @@
+type: object
+required:
+  - visibility
+properties:
+  visibility:
+    $ref: '../response/Visibility.yml'

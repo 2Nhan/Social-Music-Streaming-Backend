@@ -4,10 +4,12 @@ import com.tunhan.micsu.dto.request.CommentRequest;
 import com.tunhan.micsu.dto.response.CommentResponse;
 import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.entity.Comment;
+import com.tunhan.micsu.entity.User;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.repository.CommentRepository;
 import com.tunhan.micsu.repository.SongRepository;
+import com.tunhan.micsu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final SongRepository songRepository;
+    private final UserRepository userRepository;
 
     @Override
     public CommentResponse addComment(String songId, CommentRequest request, String userId) {
@@ -61,10 +64,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentResponse toResponse(Comment comment) {
+        User user = userRepository.findById(comment.getUserId()).orElse(null);
+
         return CommentResponse.builder()
                 .id(comment.getId())
                 .songId(comment.getSongId())
                 .userId(comment.getUserId())
+                .username(user != null ? user.getUsername() : null)
+                .avatarUrl(user != null ? user.getAvatarUrl() : null)
                 .content(comment.getContent())
                 .timestampInSong(comment.getTimestampInSong())
                 .createdAt(comment.getCreatedAt() != null ? comment.getCreatedAt().toString() : null)

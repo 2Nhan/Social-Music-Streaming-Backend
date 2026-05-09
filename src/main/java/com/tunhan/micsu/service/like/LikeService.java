@@ -13,4 +13,6 @@ public interface LikeService {
     void like(String songId, String userId);
 
     void unlike(String songId, String userId);
+
+    long incrementLikeCount(String songId);
 }

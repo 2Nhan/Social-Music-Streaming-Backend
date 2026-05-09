@@ -29,6 +29,12 @@ properties:
     $ref: "./Visibility.yml"
   uploadedBy:
     type: string
+  uploaderUsername:
+    type: string
+    nullable: true
+  uploaderAvatarUrl:
+    type: string
+    nullable: true
   createdAt:
     type: string
     description: ISO 8601 timestamp.

@@ -1,6 +1,7 @@
 package com.tunhan.micsu.dto.request;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -9,5 +10,5 @@ import lombok.*;
 @Builder
 public class UpdateProfileRequest {
     private String bio;
-    private String avatarUrl;
+    private MultipartFile avatarFile;
 }

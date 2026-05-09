@@ -3,20 +3,20 @@
     {
       "kind": "AnnotationQuery",
       "spec": {
-        "query": {
-          "kind": "DataQuery",
-          "group": "grafana",
-          "version": "v0",
-          "datasource": {
-            "name": "-- Grafana --"
-          },
-          "spec": {}
-        },
+        "builtIn": true,
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "builtIn": true
+        "query": {
+          "datasource": {
+            "name": "-- Grafana --"
+          },
+          "group": "grafana",
+          "kind": "DataQuery",
+          "spec": {},
+          "version": "v0"
+        }
       }
     }
   ],
@@ -26,10 +26,6 @@
     "panel-1": {
       "kind": "Panel",
       "spec": {
-        "id": 1,
-        "title": "InnoDB Row Lock Waits Rate",
-        "description": "Rate of InnoDB row lock wait events. Sustained values above zero indicate row lock contention.",
-        "links": [],
         "data": {
           "kind": "QueryGroup",
           "spec": {
@@ -37,69 +33,40 @@
               {
                 "kind": "PanelQuery",
                 "spec": {
+                  "hidden": false,
                   "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
                     "datasource": {
                       "name": "bfku2277z0074c"
                     },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
                     "spec": {
                       "editorMode": "code",
                       "expr": "rate(mysql_global_status_innodb_row_lock_waits[1m])",
+                      "interval": "5s",
                       "legendFormat": "row lock waits/sec {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
+                      "range": true
+                    },
+                    "version": "v0"
                   },
-                  "refId": "A",
-                  "hidden": false
+                  "refId": "A"
                 }
               }
             ],
-            "transformations": [],
-            "queryOptions": {}
+            "queryOptions": {},
+            "transformations": []
           }
         },
+        "description": "Rate of InnoDB row lock wait events. Sustained values above zero indicate row lock contention.",
+        "id": 1,
+        "links": [],
+        "title": "InnoDB Row Lock Waits Rate",
         "vizConfig": {
-          "kind": "VizConfig",
           "group": "timeseries",
-          "version": "13.0.1",
+          "kind": "VizConfig",
           "spec": {
-            "options": {
-              "annotations": {
-                "clustering": -1,
-                "multiLane": false
-              },
-              "legend": {
-                "calcs": [],
-                "displayMode": "list",
-                "placement": "bottom",
-                "showLegend": true
-              },
-              "tooltip": {
-                "hideZeros": false,
-                "mode": "single",
-                "sort": "none"
-              }
-            },
             "fieldConfig": {
               "defaults": {
-                "unit": "short",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    },
-                    {
-                      "value": 0.0001,
-                      "color": "yellow"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -136,57 +103,25 @@
                   "thresholdsStyle": {
                     "mode": "line"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0001
+                    }
+                  ]
+                },
+                "unit": "short"
               },
               "overrides": []
-            }
-          }
-        }
-      }
-    },
-    "panel-2": {
-      "kind": "Panel",
-      "spec": {
-        "id": 2,
-        "title": "InnoDB Row Lock Wait Time Rate (Wait Density)",
-        "description": "Total row-lock wait seconds accumulated per real second.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "rate(mysql_global_status_innodb_row_lock_time[1m]) / 1000",
-                      "legendFormat": "wait seconds/sec {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -203,28 +138,174 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-10": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "jvm_memory_used_bytes{area=\"heap\"}",
+                      "legendFormat": "{{id}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 10,
+        "links": [],
+        "title": "Heap Memory Usage",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "s",
-                "min": 0,
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
                     {
-                      "value": 0,
-                      "color": "green"
+                      "color": "green",
+                      "value": 0
                     },
                     {
-                      "value": 0.5,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 1,
-                      "color": "red"
+                      "color": "red",
+                      "value": 80
                     }
                   ]
-                },
+                }
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-2": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "rate(mysql_global_status_innodb_row_lock_time[1m]) / 1000",
+                      "interval": "5s",
+                      "legendFormat": "wait seconds/sec {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Total row-lock wait seconds accumulated per real second.",
+        "id": 2,
+        "links": [],
+        "title": "InnoDB Row Lock Wait Time Rate (Wait Density)",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -261,57 +342,29 @@
                   "thresholdsStyle": {
                     "mode": "line"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                },
+                "unit": "s"
               },
               "overrides": []
-            }
-          }
-        }
-      }
-    },
-    "panel-3": {
-      "kind": "Panel",
-      "spec": {
-        "id": 3,
-        "title": "Average Wait Time per Lock",
-        "description": "Estimated average wait duration for each row-lock wait event.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "(rate(mysql_global_status_innodb_row_lock_time[1m]) / clamp_min(rate(mysql_global_status_innodb_row_lock_waits[1m]), 0.001)) / 1000",
-                      "legendFormat": "avg wait/lock {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -328,28 +381,56 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-3": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "(rate(mysql_global_status_innodb_row_lock_time[1m]) / clamp_min(rate(mysql_global_status_innodb_row_lock_waits[1m]), 0.001)) / 1000",
+                      "interval": "5s",
+                      "legendFormat": "avg wait/lock {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Estimated average wait duration for each row-lock wait event.",
+        "id": 3,
+        "links": [],
+        "title": "Average Wait Time per Lock",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "s",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    },
-                    {
-                      "value": 0.1,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 0.5,
-                      "color": "red"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -386,79 +467,29 @@
                   "thresholdsStyle": {
                     "mode": "line"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                },
+                "unit": "s"
               },
               "overrides": []
-            }
-          }
-        }
-      }
-    },
-    "panel-4": {
-      "kind": "Panel",
-      "spec": {
-        "id": 4,
-        "title": "MySQL Threads Running & Connected",
-        "description": "Database execution concurrency and connection pressure.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "mysql_global_status_threads_running",
-                      "legendFormat": "threads running {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              },
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "mysql_global_status_threads_connected",
-                      "legendFormat": "threads connected {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "B",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -475,20 +506,78 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-4": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "mysql_global_status_threads_running",
+                      "interval": "5s",
+                      "legendFormat": "threads running {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "mysql_global_status_threads_connected",
+                      "interval": "5s",
+                      "legendFormat": "threads connected {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Database execution concurrency and connection pressure.",
+        "id": 4,
+        "links": [],
+        "title": "MySQL Threads Running & Connected",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "short",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -525,7 +614,18 @@
                   "thresholdsStyle": {
                     "mode": "off"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "short"
               },
               "overrides": [
                 {
@@ -561,54 +661,7 @@
                   ]
                 }
               ]
-            }
-          }
-        }
-      }
-    },
-    "panel-5": {
-      "kind": "Panel",
-      "spec": {
-        "id": 5,
-        "title": "DB Host CPU Usage",
-        "description": "CPU utilization on database host instances.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])))",
-                      "legendFormat": "cpu usage {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -625,28 +678,56 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-5": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])))",
+                      "interval": "5s",
+                      "legendFormat": "cpu usage {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "CPU utilization on database host instances.",
+        "id": 5,
+        "links": [],
+        "title": "Host CPU Usage",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "percent",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    },
-                    {
-                      "value": 70,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 90,
-                      "color": "red"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -683,79 +764,29 @@
                   "thresholdsStyle": {
                     "mode": "line"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 70
+                    },
+                    {
+                      "color": "red",
+                      "value": 90
+                    }
+                  ]
+                },
+                "unit": "percent"
               },
               "overrides": []
-            }
-          }
-        }
-      }
-    },
-    "panel-6": {
-      "kind": "Panel",
-      "spec": {
-        "id": 6,
-        "title": "End-to-End App Latency (p95 & p99)",
-        "description": "Application request latency percentiles calculated from histogram buckets.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "1000 * histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))",
-                      "legendFormat": "p95 latency {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              },
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "1000 * histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[1m])))",
-                      "legendFormat": "p99 latency {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "B",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -772,28 +803,78 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-6": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "1000 * histogram_quantile(0.95, sum by (le, instance) (rate(http_server_requests_seconds_bucket[5m])))",
+                      "interval": "5s",
+                      "legendFormat": "p95 latency {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "1000 * histogram_quantile(0.99, sum by (le, instance) (rate(http_server_requests_seconds_bucket[5m])))",
+                      "interval": "5s",
+                      "legendFormat": "p99 latency {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Application request latency percentiles calculated from histogram buckets.",
+        "id": 6,
+        "links": [],
+        "title": "End-to-End App Latency (p95 & p99)",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "ms",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    },
-                    {
-                      "value": 500,
-                      "color": "yellow"
-                    },
-                    {
-                      "value": 1000,
-                      "color": "red"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -830,57 +911,29 @@
                   "thresholdsStyle": {
                     "mode": "line"
                   }
-                }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 500
+                    },
+                    {
+                      "color": "red",
+                      "value": 1000
+                    }
+                  ]
+                },
+                "unit": "ms"
               },
               "overrides": []
-            }
-          }
-        }
-      }
-    },
-    "panel-7": {
-      "kind": "Panel",
-      "spec": {
-        "id": 7,
-        "title": "Application Throughput (RPS)",
-        "description": "Application request throughput in requests per second.",
-        "links": [],
-        "data": {
-          "kind": "QueryGroup",
-          "spec": {
-            "queries": [
-              {
-                "kind": "PanelQuery",
-                "spec": {
-                  "query": {
-                    "kind": "DataQuery",
-                    "group": "prometheus",
-                    "version": "v0",
-                    "datasource": {
-                      "name": "bfku2277z0074c"
-                    },
-                    "spec": {
-                      "editorMode": "code",
-                      "expr": "sum(rate(http_requests_total[1m]))",
-                      "legendFormat": "requests/sec {{instance}}",
-                      "range": true,
-                      "interval": "5s"
-                    }
-                  },
-                  "refId": "A",
-                  "hidden": false
-                }
-              }
-            ],
-            "transformations": [],
-            "queryOptions": {}
-          }
-        },
-        "vizConfig": {
-          "kind": "VizConfig",
-          "group": "timeseries",
-          "version": "13.0.1",
-          "spec": {
+            },
             "options": {
               "annotations": {
                 "clustering": -1,
@@ -897,20 +950,56 @@
                 "mode": "single",
                 "sort": "none"
               }
-            },
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-7": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "bfku2277z0074c"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "sum by (instance) (irate(http_server_requests_seconds_count[1m]))",
+                      "interval": "5s",
+                      "legendFormat": "requests/sec {{instance}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Application request throughput in requests per second.",
+        "id": 7,
+        "links": [],
+        "title": "Application Throughput (RPS)",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
             "fieldConfig": {
               "defaults": {
-                "unit": "reqps",
-                "min": 0,
-                "thresholds": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "value": 0,
-                      "color": "green"
-                    }
-                  ]
-                },
                 "color": {
                   "mode": "palette-classic"
                 },
@@ -947,11 +1036,276 @@
                   "thresholdsStyle": {
                     "mode": "off"
                   }
+                },
+                "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                },
+                "unit": "reqps"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-8": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "jvm_threads_live_threads",
+                      "legendFormat": "Thread",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "",
+        "id": 8,
+        "links": [],
+        "title": "Thread Count",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
                 }
               },
               "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
             }
+          },
+          "version": "13.0.1"
+        }
+      }
+    },
+    "panel-9": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": {
+                      "name": "prometheus"
+                    },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": {
+                      "editorMode": "code",
+                      "expr": "sum by (action) (rate(jvm_gc_pause_seconds_sum[1m]))",
+                      "legendFormat": "{{label_name}}",
+                      "range": true
+                    },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
           }
+        },
+        "description": "",
+        "id": 9,
+        "links": [],
+        "title": "GC Pause",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "palette-classic"
+                },
+                "custom": {
+                  "axisBorderShow": false,
+                  "axisCenteredZero": false,
+                  "axisColorMode": "text",
+                  "axisLabel": "",
+                  "axisPlacement": "auto",
+                  "barAlignment": 0,
+                  "barWidthFactor": 0.6,
+                  "drawStyle": "line",
+                  "fillOpacity": 0,
+                  "gradientMode": "none",
+                  "hideFrom": {
+                    "legend": false,
+                    "tooltip": false,
+                    "viz": false
+                  },
+                  "insertNulls": false,
+                  "lineInterpolation": "linear",
+                  "lineWidth": 1,
+                  "pointSize": 5,
+                  "scaleDistribution": {
+                    "type": "linear"
+                  },
+                  "showPoints": "auto",
+                  "showValues": false,
+                  "spanNulls": false,
+                  "stacking": {
+                    "group": "A",
+                    "mode": "none"
+                  },
+                  "thresholdsStyle": {
+                    "mode": "off"
+                  }
+                },
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 80
+                    }
+                  ]
+                }
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": {
+                "clustering": -1,
+                "multiLane": false
+              },
+              "legend": {
+                "calcs": [],
+                "displayMode": "list",
+                "placement": "bottom",
+                "showLegend": true
+              },
+              "tooltip": {
+                "hideZeros": false,
+                "mode": "single",
+                "sort": "none"
+              }
+            }
+          },
+          "version": "13.0.1"
         }
       }
     }
@@ -963,92 +1317,131 @@
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 0,
-            "width": 24,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-1"
-            }
+            },
+            "height": 10,
+            "width": 12,
+            "x": 0,
+            "y": 0
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 8,
-            "width": 12,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-2"
-            }
+            },
+            "height": 10,
+            "width": 12,
+            "x": 12,
+            "y": 0
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 12,
-            "y": 8,
-            "width": 12,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-3"
-            }
+            },
+            "height": 9,
+            "width": 12,
+            "x": 0,
+            "y": 10
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 16,
-            "width": 24,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-4"
-            }
+            },
+            "height": 9,
+            "width": 12,
+            "x": 12,
+            "y": 10
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 24,
-            "width": 24,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-5"
-            }
+            },
+            "height": 10,
+            "width": 12,
+            "x": 0,
+            "y": 19
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 32,
-            "width": 24,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-6"
-            }
+            },
+            "height": 10,
+            "width": 12,
+            "x": 12,
+            "y": 19
           }
         },
         {
           "kind": "GridLayoutItem",
           "spec": {
-            "x": 0,
-            "y": 40,
-            "width": 24,
-            "height": 8,
             "element": {
               "kind": "ElementReference",
               "name": "panel-7"
-            }
+            },
+            "height": 8,
+            "width": 24,
+            "x": 0,
+            "y": 29
+          }
+        },
+        {
+          "kind": "GridLayoutItem",
+          "spec": {
+            "element": {
+              "kind": "ElementReference",
+              "name": "panel-8"
+            },
+            "height": 8,
+            "width": 12,
+            "x": 0,
+            "y": 37
+          }
+        },
+        {
+          "kind": "GridLayoutItem",
+          "spec": {
+            "element": {
+              "kind": "ElementReference",
+              "name": "panel-9"
+            },
+            "height": 8,
+            "width": 12,
+            "x": 12,
+            "y": 37
+          }
+        },
+        {
+          "kind": "GridLayoutItem",
+          "spec": {
+            "element": {
+              "kind": "ElementReference",
+              "name": "panel-10"
+            },
+            "height": 8,
+            "width": 12,
+            "x": 0,
+            "y": 45
           }
         }
       ]
@@ -1056,6 +1449,14 @@
   },
   "links": [],
   "liveNow": false,
+  "preferences": {
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": []
+      }
+    }
+  },
   "preload": false,
   "tags": [
     "mysql",
@@ -1064,10 +1465,7 @@
     "sre"
   ],
   "timeSettings": {
-    "timezone": "browser",
-    "from": "now-10m",
-    "to": "now",
-    "autoRefresh": "5s",
+    "autoRefresh": "auto",
     "autoRefreshIntervals": [
       "5s",
       "10s",
@@ -1075,17 +1473,12 @@
       "1m",
       "5m"
     ],
+    "fiscalYearStartMonth": 0,
+    "from": "now-30m",
     "hideTimepicker": false,
-    "fiscalYearStartMonth": 0
+    "timezone": "browser",
+    "to": "now"
   },
   "title": "Lock Contention Root Cause Dashboard",
-  "variables": [],
-  "preferences": {
-    "layout": {
-      "kind": "GridLayout",
-      "spec": {
-        "items": []
-      }
-    }
-  }
+  "variables": []
 }

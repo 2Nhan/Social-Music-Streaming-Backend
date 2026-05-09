@@ -110,6 +110,29 @@ public class R2StorageService {
                 });
     }
 
+    public String uploadAvatar(MultipartFile file, String userId) throws IOException {
+        this.checkImageInput(file);
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = ".jpg";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String uniqueFileName = UUID.randomUUID().toString() + extension;
+        String key = "users/" + userId + "/avatars/" + uniqueFileName;
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(mBucket)
+                .key(key)
+                .contentType(file.getContentType())
+                .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+        log.info("[R2StorageService] Avatar uploaded successfully: {}", key);
+        return publicDomain + "/" + key;
+    }
+
     private void checkImageInput(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Image file must not be empty.");

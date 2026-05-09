@@ -3,6 +3,8 @@ properties:
   bio:
     type: string
     nullable: true
-  avatarUrl:
+  avatarFile:
     type: string
+    format: binary
     nullable: true
+    description: Avatar image file. Supported content types are image/jpeg, image/png, and image/gif.

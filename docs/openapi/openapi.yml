@@ -86,8 +86,12 @@ paths:
   # ── Playlists ─────────────────────────────────────────────
   /api/v1/playlists:
     $ref: "./paths/playlists.yml#/PlaylistCollection"
+  /api/v1/playlists/public:
+    $ref: "./paths/playlists.yml#/PlaylistPublic"
   /api/v1/playlists/{id}:
     $ref: "./paths/playlists.yml#/PlaylistById"
+  /api/v1/playlists/{id}/visibility:
+    $ref: "./paths/playlists.yml#/PlaylistVisibility"
   /api/v1/playlists/{id}/songs:
     $ref: "./paths/playlists.yml#/PlaylistSongs"
   /api/v1/playlists/{id}/songs/{songId}:
@@ -132,6 +136,8 @@ components:
       $ref: "./components/schemas/request/CommentRequest.yml"
     PlaylistRequest:
       $ref: "./components/schemas/request/PlaylistRequest.yml"
+    PlaylistVisibilityRequest:
+      $ref: "./components/schemas/request/PlaylistVisibilityRequest.yml"
     AddSongToPlaylistRequest:
       $ref: "./components/schemas/request/AddSongToPlaylistRequest.yml"
     SongUploadRequest:

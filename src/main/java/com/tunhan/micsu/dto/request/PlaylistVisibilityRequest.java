@@ -1,7 +1,7 @@
 package com.tunhan.micsu.dto.request;
 
 import com.tunhan.micsu.entity.enums.Visibility;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -9,11 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PlaylistRequest {
+public class PlaylistVisibilityRequest {
 
-    @NotBlank(message = "Playlist name is required")
-    private String name;
-
-    private String description;
+    @NotNull(message = "Playlist visibility is required")
     private Visibility visibility;
 }

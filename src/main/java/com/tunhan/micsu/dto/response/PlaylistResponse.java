@@ -3,6 +3,8 @@ package com.tunhan.micsu.dto.response;
 import com.tunhan.micsu.entity.enums.Visibility;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,4 +19,5 @@ public class PlaylistResponse {
     private Long songCount;
     private String createdBy;
     private String createdAt;
+    private List<SongResponse> songs;
 }

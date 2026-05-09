@@ -6,6 +6,12 @@ properties:
     type: string
   userId:
     type: string
+  username:
+    type: string
+    nullable: true
+  avatarUrl:
+    type: string
+    nullable: true
   content:
     type: string
   timestampInSong:

@@ -15,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
@@ -30,11 +32,11 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(userService.getUserById(id)));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
             @PathVariable String id,
-            @RequestBody UpdateProfileRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
+            @ModelAttribute UpdateProfileRequest request,
+            @AuthenticationPrincipal Jwt jwt) throws IOException {
         return ResponseEntity.ok(ApiResponse.success("Profile updated successfully",
                 userService.updateProfile(id, request, jwt.getSubject())));
     }

@@ -81,4 +81,10 @@ public class TestController {
         likeService.atomicUpdateLikeSong(songId);
         return ResponseEntity.ok(ApiResponse.success("Concurrent like test completed", null));
     }
+
+    @PostMapping("/test/redis-incre-likes/{songId}")
+    public ResponseEntity<ApiResponse<Void>> testConcurrentLikesWithRedis(@PathVariable String songId) {
+        likeService.incrementLikeCount(songId);
+        return ResponseEntity.ok(ApiResponse.success("Concurrent like test completed", null));
+    }
 }

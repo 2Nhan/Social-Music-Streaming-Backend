@@ -1,6 +1,7 @@
 package com.tunhan.micsu.service.playlist;
 
 import com.tunhan.micsu.dto.request.PlaylistRequest;
+import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.PlaylistResponse;
 import com.tunhan.micsu.entity.Playlist;
 import com.tunhan.micsu.entity.PlaylistSong;
@@ -8,11 +9,14 @@ import com.tunhan.micsu.entity.enums.Visibility;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.DuplicateResourceException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
+import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.PlaylistRepository;
 import com.tunhan.micsu.repository.PlaylistSongRepository;
 import com.tunhan.micsu.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,21 @@ public class PlaylistServiceImpl implements PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistSongRepository playlistSongRepository;
     private final SongRepository songRepository;
+    private final SongMapper songMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PlaylistResponse> getAllPublicPlaylists(Pageable pageable) {
+        Page<Playlist> page = playlistRepository.findAllByVisibility(Visibility.PUBLIC, pageable);
+        return toPageResponse(page);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PlaylistResponse> getAllPlaylists(String userId, Pageable pageable) {
+        Page<Playlist> page = playlistRepository.findByCreatedBy(userId, pageable);
+        return toPageResponse(page);
+    }
 
     @Override
     public PlaylistResponse createPlaylist(PlaylistRequest request, String userId) {
@@ -47,6 +66,14 @@ public class PlaylistServiceImpl implements PlaylistService {
             playlist.setDescription(request.getDescription());
         if (request.getVisibility() != null)
             playlist.setVisibility(request.getVisibility());
+        playlistRepository.save(playlist);
+        return toResponse(playlist);
+    }
+
+    @Override
+    public PlaylistResponse updatePlaylistVisibility(String id, Visibility visibility, String userId) {
+        Playlist playlist = findAndCheckOwnership(id, userId);
+        playlist.setVisibility(visibility);
         playlistRepository.save(playlist);
         return toResponse(playlist);
     }
@@ -97,10 +124,14 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
-    public PlaylistResponse getPlaylistById(String id) {
+    @Transactional(readOnly = true)
+    public PlaylistResponse getPlaylistById(String id, String userId) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Playlist", id));
-        return toResponse(playlist);
+        if (playlist.getVisibility() == Visibility.PRIVATE && !playlist.getCreatedBy().equals(userId)) {
+            throw new AccessDeniedException("You do not have permission to view this playlist");
+        }
+        return toResponseWithSongs(playlist);
     }
 
     private Playlist findAndCheckOwnership(String id, String userId) {
@@ -110,6 +141,15 @@ public class PlaylistServiceImpl implements PlaylistService {
             throw new AccessDeniedException("You can only manage your own playlists");
         }
         return playlist;
+    }
+
+    private PageResponse<PlaylistResponse> toPageResponse(Page<Playlist> page) {
+        return PageResponse.<PlaylistResponse>builder()
+                .content(page.getContent().stream().map(this::toResponse).toList())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build();
     }
 
     private PlaylistResponse toResponse(Playlist playlist) {
@@ -123,5 +163,15 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .createdBy(playlist.getCreatedBy())
                 .createdAt(playlist.getCreatedAt() != null ? playlist.getCreatedAt().toString() : null)
                 .build();
+    }
+
+    private PlaylistResponse toResponseWithSongs(Playlist playlist) {
+        PlaylistResponse response = toResponse(playlist);
+        response.setSongs(playlistSongRepository.findWithSongByPlaylistIdOrderByPosition(playlist.getId())
+                .stream()
+                .map(PlaylistSong::getSong)
+                .map(songMapper::toSongResponse)
+                .toList());
+        return response;
     }
 }

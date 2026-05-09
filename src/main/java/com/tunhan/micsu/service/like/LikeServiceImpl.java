@@ -56,7 +56,6 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public void like(String songId, String userId) {
         if(!redisLike(songId, userId)) {
-            log.warn("[LikeService] User {} already liked song {}", userId, songId);
             throw new DuplicateResourceException("User has already liked this song");
         }
     }
@@ -64,7 +63,6 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public void unlike(String songId, String userId) {
         if(!redisUnlike(songId, userId)) {
-            log.warn("[LikeService] User {} has not liked song {}", userId, songId);
             throw new ResourceNotFoundException("User has not liked this song");
         }
     }
@@ -91,5 +89,13 @@ public class LikeServiceImpl implements LikeService {
         String key = "likes:" + songId;
         Boolean isMember = stringRedisTemplate.opsForSet().isMember(key, userId);
         return Boolean.TRUE.equals(isMember);
+    }
+
+    @Override
+    public long incrementLikeCount(String songId) {
+        String key = "song_like_count:" + songId;
+        Long currentCount = stringRedisTemplate.opsForValue().increment(key);
+
+        return currentCount != null ? currentCount : 0L;
     }
 }

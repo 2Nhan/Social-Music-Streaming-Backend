@@ -1,6 +1,50 @@
 # Playlist endpoints from PlaylistController
 
 PlaylistCollection:
+  get:
+    tags: [Playlists]
+    summary: Get playlists created by authenticated user
+    operationId: getAllPlaylist
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
+        description: Number of items per page.
+    responses:
+      "200":
+        description: User playlists retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/PlaylistResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
   post:
     tags: [Playlists]
     summary: Create a playlist
@@ -38,6 +82,45 @@ PlaylistCollection:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
 
+PlaylistPublic:
+  get:
+    tags: [Playlists]
+    summary: Get public playlists
+    operationId: getAllPublicPlaylist
+    security: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
+        description: Number of items per page.
+    responses:
+      "200":
+        description: Public playlists retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/PlaylistResponse.yml"
+
 PlaylistById:
   get:
     tags: [Playlists]
@@ -69,6 +152,7 @@ PlaylistById:
           application/json:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
+
   put:
     tags: [Playlists]
     summary: Update a playlist
@@ -144,6 +228,64 @@ PlaylistById:
                     data:
                       nullable: true
                       example: null
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "403":
+        description: Access denied.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: Playlist not found.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+
+PlaylistVisibility:
+  patch:
+    tags: [Playlists]
+    summary: Update playlist visibility
+    description: Only the playlist owner can change a playlist between PUBLIC and PRIVATE.
+    operationId: updatePlaylistVisibility
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: Playlist id.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/request/PlaylistVisibilityRequest.yml"
+    responses:
+      "200":
+        description: Playlist visibility updated successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/response/PlaylistResponse.yml"
+      "400":
+        description: Validation failed.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
       "401":
         description: Unauthenticated.
         content:
