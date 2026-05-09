@@ -27,6 +27,14 @@ properties:
     format: int64
   visibility:
     $ref: "./Visibility.yml"
+  genreId:
+    type: string
+    nullable: true
+  genreName:
+    $ref: "./GenreName.yml"
+  genreImage:
+    type: string
+    nullable: true
   uploadedBy:
     type: string
   uploaderUsername:

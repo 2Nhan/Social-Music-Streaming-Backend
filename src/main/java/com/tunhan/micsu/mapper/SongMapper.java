@@ -1,8 +1,10 @@
 package com.tunhan.micsu.mapper;
 
 import com.tunhan.micsu.dto.response.SongResponse;
+import com.tunhan.micsu.entity.Genre;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.entity.User;
+import com.tunhan.micsu.repository.GenreRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,10 +14,14 @@ import org.springframework.stereotype.Component;
 public class SongMapper {
 
     private final UserRepository userRepository;
+    private final GenreRepository genreRepository;
 
     public SongResponse toSongResponse(Song song) {
         User uploader = song.getUploadedBy() != null
                 ? userRepository.findById(song.getUploadedBy()).orElse(null)
+                : null;
+        Genre genre = song.getGenreId() != null
+                ? genreRepository.findById(song.getGenreId()).orElse(null)
                 : null;
 
         return SongResponse.builder()
@@ -29,6 +35,9 @@ public class SongMapper {
                 .viewCount(song.getViewCount())
                 .repostCount(song.getRepostCount())
                 .visibility(song.getVisibility())
+                .genreId(song.getGenreId())
+                .genreName(genre != null ? genre.getName() : null)
+                .genreImage(genre != null ? genre.getImage() : null)
                 .uploadedBy(song.getUploadedBy())
                 .uploaderUsername(uploader != null ? uploader.getUsername() : null)
                 .uploaderAvatarUrl(uploader != null ? uploader.getAvatarUrl() : null)

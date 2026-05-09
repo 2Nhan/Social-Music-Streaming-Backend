@@ -4,11 +4,13 @@ import com.tunhan.micsu.dto.request.SongUpdateRequest;
 import com.tunhan.micsu.dto.request.SongUploadRequest;
 import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
+import com.tunhan.micsu.entity.Genre;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.entity.enums.Visibility;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.mapper.SongMapper;
+import com.tunhan.micsu.repository.GenreRepository;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
 import com.tunhan.micsu.service.R2StorageService;
@@ -33,6 +35,7 @@ public class SongServiceImpl implements SongService {
 
     private final SongRepository songRepository;
     private final UserRepository userRepository;
+    private final GenreRepository genreRepository;
     private final R2StorageService r2StorageService;
     private final HlsService hlsServiceV3;
     private final HlsService hlsServiceV2;
@@ -41,12 +44,14 @@ public class SongServiceImpl implements SongService {
     public SongServiceImpl(
             SongRepository songRepository,
             UserRepository userRepository,
+            GenreRepository genreRepository,
             R2StorageService r2StorageService,
             @Qualifier("hlsServiceV3") HlsService hlsServiceV3,
             @Qualifier("hlsServiceV2") HlsService hlsServiceV2,
             SongMapper songMapper) {
         this.songRepository = songRepository;
         this.userRepository = userRepository;
+        this.genreRepository = genreRepository;
         this.r2StorageService = r2StorageService;
         this.hlsServiceV3 = hlsServiceV3;
         this.hlsServiceV2 = hlsServiceV2;
@@ -74,6 +79,8 @@ public class SongServiceImpl implements SongService {
 
         try {
             log.info("[SongService] Begin processing song upload. Name: '{}', ID: {}", request.getTitle(), id);
+            Genre genre = genreRepository.findByName(request.getGerne())
+                    .orElseThrow(() -> new ResourceNotFoundException("Genre", request.getGerne().name()));
 
             tempMp3 = Files.createTempFile("upload_", ".mp3");
             request.getAudioFile().transferTo(tempMp3);
@@ -96,6 +103,7 @@ public class SongServiceImpl implements SongService {
             song.setAudioUrl(hlsUrl);
             song.setDuration(duration);
             song.setUploadedBy(request.getUploadedBy());
+            song.setGenreId(genre.getId());
             song.setVisibility(request.getVisibility() != null ? request.getVisibility() : Visibility.PUBLIC);
             songRepository.save(song);
 

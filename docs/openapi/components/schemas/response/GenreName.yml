@@ -1,0 +1,37 @@
+type: string
+enum:
+  - POP
+  - ROCK
+  - HIP_HOP
+  - RAP
+  - R_AND_B
+  - EDM
+  - HOUSE
+  - TECHNO
+  - TRANCE
+  - DUBSTEP
+  - JAZZ
+  - BLUES
+  - CLASSICAL
+  - COUNTRY
+  - FOLK
+  - REGGAE
+  - LATIN
+  - K_POP
+  - J_POP
+  - V_POP
+  - METAL
+  - PUNK
+  - SOUL
+  - FUNK
+  - DISCO
+  - INDIE
+  - ALTERNATIVE
+  - AMBIENT
+  - LOFI
+  - ACOUSTIC
+  - INSTRUMENTAL
+  - SOUNDTRACK
+  - GOSPEL
+  - WORLD
+  - VIETNAMESE

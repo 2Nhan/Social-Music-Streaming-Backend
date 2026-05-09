@@ -50,6 +50,8 @@ public class SecurityConfig {
                         "/api/v1/songs/*/stream/**",
                         "/api/v1/search",
                         "/api/v1/search/**",
+                        "/api/v1/genres",
+                        "/api/v1/genres/*/songs",
                         "/api/v1/songs/*/comments",
                         "/api/v1/users/*",
                         "/api/v1/users/*/songs",

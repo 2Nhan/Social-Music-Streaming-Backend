@@ -59,4 +59,11 @@ public class Song extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by", insertable = false, updatable = false)
     private User uploader;
+
+    @Column(name = "genre_id")
+    private String genreId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", insertable = false, updatable = false)
+    private Genre genre;
 }

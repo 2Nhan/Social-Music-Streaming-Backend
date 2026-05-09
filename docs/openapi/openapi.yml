@@ -25,6 +25,8 @@ tags:
     description: Registration, login, token refresh, and logout.
   - name: Songs
     description: Song upload, retrieval, update, deletion, and HLS streaming.
+  - name: Genres
+    description: Music genres and genre-based song discovery.
   - name: Search
     description: Song search and autocomplete.
   - name: Comments
@@ -64,6 +66,10 @@ paths:
     $ref: "./paths/songs.yml#/SongById"
   /api/v1/songs/{songId}/stream/master.m3u8:
     $ref: "./paths/songs.yml#/StreamHls"
+  /api/v1/genres:
+    $ref: "./paths/genres.yml#/GenresCollection"
+  /api/v1/genres/{genreName}/songs:
+    $ref: "./paths/genres.yml#/GenreSongs"
 
   # ── Search ────────────────────────────────────────────────
   /api/v1/search:
@@ -164,6 +170,8 @@ components:
       $ref: "./components/schemas/response/ErrorResponse.yml"
     AuthResponse:
       $ref: "./components/schemas/response/AuthResponse.yml"
+    GenreResponse:
+      $ref: "./components/schemas/response/GenreResponse.yml"
     CommentResponse:
       $ref: "./components/schemas/response/CommentResponse.yml"
     LikeResponse:
@@ -186,5 +194,7 @@ components:
     # ── Enums ──
     TargetType:
       $ref: "./components/schemas/response/TargetType.yml"
+    GenreName:
+      $ref: "./components/schemas/response/GenreName.yml"
     Visibility:
       $ref: "./components/schemas/response/Visibility.yml"

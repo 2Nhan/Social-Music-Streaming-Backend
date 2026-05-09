@@ -1,0 +1,9 @@
+type: object
+properties:
+  id:
+    type: string
+  name:
+    $ref: './GenreName.yml'
+  image:
+    type: string
+    nullable: true

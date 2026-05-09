@@ -6,6 +6,7 @@ import com.tunhan.micsu.dto.response.ApiResponse;
 import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.service.song.SongService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class SongController {
 
     @PostMapping(value = "/songs/upload", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<Void>> uploadSong(
-            @ModelAttribute SongUploadRequest request,
+            @Valid @ModelAttribute SongUploadRequest request,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
         if (jwt != null) {
             request.setUploadedBy(jwt.getSubject());
@@ -36,7 +37,7 @@ public class SongController {
 
     @PostMapping("/songs/uploadV2")
     public ResponseEntity<ApiResponse<Void>> uploadSongV2(
-            @ModelAttribute SongUploadRequest request,
+            @Valid @ModelAttribute SongUploadRequest request,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
         if (jwt != null)
             request.setUploadedBy(jwt.getSubject());

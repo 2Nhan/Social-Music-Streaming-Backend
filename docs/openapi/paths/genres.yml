@@ -1,0 +1,75 @@
+# Genre endpoints from GenreController
+
+GenresCollection:
+  get:
+    tags: [Genres]
+    summary: List all genres
+    description: Retrieve all predefined music genres.
+    operationId: getAllGenres
+    security: []
+    responses:
+      "200":
+        description: Genres retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: "../components/schemas/response/GenreResponse.yml"
+
+GenreSongs:
+  get:
+    tags: [Genres]
+    summary: Get songs by genre
+    description: Retrieve paginated songs for a genre name.
+    operationId: getSongsByGenre
+    security: []
+    parameters:
+      - in: path
+        name: genreName
+        required: true
+        schema:
+          $ref: "../components/schemas/response/GenreName.yml"
+        description: Genre name.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
+    responses:
+      "200":
+        description: Songs retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/SongResponse.yml"
+      "404":
+        description: Genre not found.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"

@@ -1,5 +1,6 @@
 package com.tunhan.micsu.dto.request;
 
+import com.tunhan.micsu.entity.enums.GenreName;
 import com.tunhan.micsu.entity.enums.Visibility;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,9 @@ public class SongUploadRequest {
 
     /** Set programmatically from JWT — not from client body */
     private String uploadedBy;
+
+    @NotNull(message = "Genre is required")
+    private GenreName gerne;
 
     /** Default PUBLIC if not specified */
     private Visibility visibility;
