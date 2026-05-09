@@ -86,8 +86,8 @@ public class SongServiceImpl implements SongService {
 
         try {
             log.info("[SongService] Begin processing song upload. Name: '{}', ID: {}", request.getTitle(), id);
-            Genre genre = genreRepository.findByName(request.getGerne())
-                    .orElseThrow(() -> new ResourceNotFoundException("Genre", request.getGerne().name()));
+            Genre genre = genreRepository.findByName(request.getGenre())
+                .orElseThrow(() -> new ResourceNotFoundException("Genre", request.getGenre().name()));
 
             tempMp3 = Files.createTempFile("upload_", ".mp3");
             request.getAudioFile().transferTo(tempMp3);

@@ -27,7 +27,7 @@ public class SongUploadRequest {
     private String uploadedBy;
 
     @NotNull(message = "Genre is required")
-    private GenreName gerne;
+    private GenreName genre;
 
     /** Default PUBLIC if not specified */
     private Visibility visibility;
