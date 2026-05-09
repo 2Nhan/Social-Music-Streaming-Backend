@@ -9,7 +9,7 @@ import com.tunhan.micsu.entity.enums.Visibility;
 import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.exception.DuplicateResourceException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
-import com.tunhan.micsu.mapper.SongMapper;
+import com.tunhan.micsu.mapper.PlaylistMapper;
 import com.tunhan.micsu.repository.PlaylistRepository;
 import com.tunhan.micsu.repository.PlaylistSongRepository;
 import com.tunhan.micsu.repository.SongRepository;
@@ -28,7 +28,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final PlaylistSongRepository playlistSongRepository;
     private final SongRepository songRepository;
-    private final SongMapper songMapper;
+    private final PlaylistMapper playlistMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,7 +61,7 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .build();
         playlistRepository.save(playlist);
         log.info("[PlaylistService] User {} created playlist {}", userId, playlist.getId());
-        return toResponse(playlist);
+        return playlistMapper.toPlaylistResponse(playlist);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         if (request.getVisibility() != null)
             playlist.setVisibility(request.getVisibility());
         playlistRepository.save(playlist);
-        return toResponse(playlist);
+        return playlistMapper.toPlaylistResponse(playlist);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         Playlist playlist = findAndCheckOwnership(id, userId);
         playlist.setVisibility(visibility);
         playlistRepository.save(playlist);
-        return toResponse(playlist);
+        return playlistMapper.toPlaylistResponse(playlist);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         playlist.setSongCount(playlist.getSongCount() + 1);
         playlistRepository.save(playlist);
-        return toResponse(playlist);
+        return playlistMapper.toPlaylistResponse(playlist);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         playlist.setSongCount(Math.max(0, playlist.getSongCount() - 1));
         playlistRepository.save(playlist);
-        return toResponse(playlist);
+        return playlistMapper.toPlaylistResponse(playlist);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         if (playlist.getVisibility() == Visibility.PRIVATE && !playlist.getCreatedBy().equals(userId)) {
             throw new AccessDeniedException("You do not have permission to view this playlist");
         }
-        return toResponseWithSongs(playlist);
+        return playlistMapper.toPlaylistResponseWithSongs(playlist);
     }
 
     private Playlist findAndCheckOwnership(String id, String userId) {
@@ -152,33 +152,11 @@ public class PlaylistServiceImpl implements PlaylistService {
 
     private PageResponse<PlaylistResponse> toPageResponse(Page<Playlist> page) {
         return PageResponse.<PlaylistResponse>builder()
-                .content(page.getContent().stream().map(this::toResponse).toList())
+                .content(page.getContent().stream().map(playlistMapper::toPlaylistResponse).toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
                 .build();
     }
 
-    private PlaylistResponse toResponse(Playlist playlist) {
-        return PlaylistResponse.builder()
-                .id(playlist.getId())
-                .name(playlist.getName())
-                .description(playlist.getDescription())
-                .coverImage(playlist.getCoverImage())
-                .visibility(playlist.getVisibility())
-                .songCount(playlist.getSongCount())
-                .createdBy(playlist.getCreatedBy())
-                .createdAt(playlist.getCreatedAt() != null ? playlist.getCreatedAt().toString() : null)
-                .build();
-    }
-
-    private PlaylistResponse toResponseWithSongs(Playlist playlist) {
-        PlaylistResponse response = toResponse(playlist);
-        response.setSongs(playlistSongRepository.findWithSongByPlaylistIdOrderByPosition(playlist.getId())
-                .stream()
-                .map(PlaylistSong::getSong)
-                .map(songMapper::toSongResponse)
-                .toList());
-        return response;
-    }
 }

@@ -8,6 +8,7 @@ import com.tunhan.micsu.exception.DuplicateResourceException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.repository.FollowRepository;
 import com.tunhan.micsu.repository.UserRepository;
+import com.tunhan.micsu.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ public class FollowServiceImpl implements FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -78,7 +80,7 @@ public class FollowServiceImpl implements FollowService {
         // ✅ Use JPA relationship navigation instead of N+1 userRepository.findById()
         return PageResponse.<UserProfileResponse>builder()
                 .content(page.getContent().stream()
-                        .map(follow -> toUserResponse(follow.getFollower()))
+                        .map(follow -> userMapper.toUserProfileResponse(follow.getFollower()))
                         .filter(u -> u != null)
                         .toList())
                 .page(page.getNumber())
@@ -93,7 +95,7 @@ public class FollowServiceImpl implements FollowService {
         // ✅ Use JPA relationship navigation instead of N+1 userRepository.findById()
         return PageResponse.<UserProfileResponse>builder()
                 .content(page.getContent().stream()
-                        .map(follow -> toUserResponse(follow.getFollowing()))
+                        .map(follow -> userMapper.toUserProfileResponse(follow.getFollowing()))
                         .filter(u -> u != null)
                         .toList())
                 .page(page.getNumber())
@@ -102,19 +104,5 @@ public class FollowServiceImpl implements FollowService {
                 .build();
     }
 
-    private UserProfileResponse toUserResponse(User user) {
-        if (user == null)
-            return null;
-        return UserProfileResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .avatarUrl(user.getAvatarUrl())
-                .bio(user.getBio())
-                .followersCount(user.getFollowersCount())
-                .followingCount(user.getFollowingCount())
-                .songCount(user.getSongCount())
-                .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null)
-                .build();
-    }
+
 }

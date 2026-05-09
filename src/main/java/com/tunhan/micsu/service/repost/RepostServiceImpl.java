@@ -8,6 +8,7 @@ import com.tunhan.micsu.exception.DuplicateResourceException;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.repository.RepostRepository;
 import com.tunhan.micsu.repository.SongRepository;
+import com.tunhan.micsu.mapper.RepostMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ public class RepostServiceImpl implements RepostService {
 
     private final RepostRepository repostRepository;
     private final SongRepository songRepository;
+    private final RepostMapper repostMapper;
 
     @Override
     @Transactional
@@ -43,7 +45,7 @@ public class RepostServiceImpl implements RepostService {
         songRepository.save(song);
 
         log.info("[RepostService] User {} reposted song {}", userId, songId);
-        return toResponse(repost);
+        return repostMapper.toRepostResponse(repost);
     }
 
     @Override
@@ -66,19 +68,12 @@ public class RepostServiceImpl implements RepostService {
     public PageResponse<RepostResponse> getUserReposts(String userId, Pageable pageable) {
         Page<Repost> page = repostRepository.findByUserId(userId, pageable);
         return PageResponse.<RepostResponse>builder()
-                .content(page.getContent().stream().map(this::toResponse).toList())
+                .content(page.getContent().stream().map(repostMapper::toRepostResponse).toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
                 .build();
     }
 
-    private RepostResponse toResponse(Repost repost) {
-        return RepostResponse.builder()
-                .id(repost.getId())
-                .songId(repost.getSongId())
-                .userId(repost.getUserId())
-                .createdAt(repost.getCreatedAt() != null ? repost.getCreatedAt().toString() : null)
-                .build();
-    }
+
 }

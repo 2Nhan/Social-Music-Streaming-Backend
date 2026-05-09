@@ -6,6 +6,7 @@ import com.tunhan.micsu.entity.ListeningHistory;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.repository.ListeningHistoryRepository;
 import com.tunhan.micsu.repository.SongRepository;
+import com.tunhan.micsu.mapper.ListeningHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ public class ListeningHistoryServiceImpl implements ListeningHistoryService {
 
     private final ListeningHistoryRepository historyRepository;
     private final SongRepository songRepository;
+    private final ListeningHistoryMapper historyMapper;
 
     @Override
     public void logListen(String songId, String userId) {
@@ -40,18 +42,12 @@ public class ListeningHistoryServiceImpl implements ListeningHistoryService {
     public PageResponse<ListeningHistoryResponse> getUserHistory(String userId, Pageable pageable) {
         Page<ListeningHistory> page = historyRepository.findByUserIdOrderByListenedAtDesc(userId, pageable);
         return PageResponse.<ListeningHistoryResponse>builder()
-                .content(page.getContent().stream().map(this::toHistoryResponse).toList())
+                .content(page.getContent().stream().map(historyMapper::toListeningHistoryResponse).toList())
                 .page(page.getNumber())
                 .size(page.getSize())
                 .totalElements(page.getTotalElements())
                 .build();
     }
 
-    private ListeningHistoryResponse toHistoryResponse(ListeningHistory h) {
-        return ListeningHistoryResponse.builder()
-                .id(h.getId())
-                .songId(h.getSongId())
-                .listenedAt(h.getListenedAt() != null ? h.getListenedAt().toString() : null)
-                .build();
-    }
+
 }

@@ -12,6 +12,7 @@ import com.tunhan.micsu.mapper.SongMapper;
 import com.tunhan.micsu.repository.SongFavoriteRepository;
 import com.tunhan.micsu.repository.SongRepository;
 import com.tunhan.micsu.repository.UserRepository;
+import com.tunhan.micsu.mapper.UserMapper;
 import com.tunhan.micsu.service.R2StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +34,14 @@ public class UserServiceImpl implements UserService {
     private final SongRepository songRepository;
     private final SongFavoriteRepository songFavoriteRepository;
     private final SongMapper songMapper;
+    private final UserMapper userMapper;
     private final R2StorageService r2StorageService;
 
     @Override
     public UserProfileResponse getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
-        return toResponse(user);
+        return userMapper.toUserProfileResponse(user);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         log.info("[UserService] Updated profile for user: {}", id);
-        return toResponse(user);
+        return userMapper.toUserProfileResponse(user);
     }
 
     @Override
@@ -83,18 +85,6 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    private UserProfileResponse toResponse(User user) {
-        return UserProfileResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .avatarUrl(user.getAvatarUrl())
-                .bio(user.getBio())
-                .followersCount(user.getFollowersCount())
-                .followingCount(user.getFollowingCount())
-                .songCount(user.getSongCount())
-                .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null)
-                .build();
-    }
+
 
 }
