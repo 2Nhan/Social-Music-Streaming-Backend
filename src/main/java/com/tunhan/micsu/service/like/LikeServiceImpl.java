@@ -1,5 +1,6 @@
 package com.tunhan.micsu.service.like;
 
+import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.entity.Song;
 import com.tunhan.micsu.entity.SongFavorite;
@@ -13,8 +14,12 @@ import com.tunhan.micsu.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -25,6 +30,15 @@ public class LikeServiceImpl implements LikeService {
     private final SongFavoriteRepository songFavoriteRepository;
     private final SongMapper songMapper;
     private final StringRedisTemplate stringRedisTemplate;
+
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // RELEASED API FLOW – DB-only (no Redis). These methods back the
+    // currently published Like endpoints:
+    //   POST   /api/v1/likes/songs/{songId}
+    //   DELETE /api/v1/likes/songs/{songId}
+    //   GET    /api/v1/likes/songs
+    // ═══════════════════════════════════════════════════════════════════════
 
     @Override
     @Transactional
@@ -70,6 +84,12 @@ public class LikeServiceImpl implements LikeService {
         songRepository.incrementFavoriteCount(songId);
     }
 
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // REDIS-BASED FLOW – NOT called by any released API endpoint.
+    // Preserved intact for future release (Redis counter / like set).
+    // ═══════════════════════════════════════════════════════════════════════
+
     @Override
     public void like(String songId, String userId) {
         if(!redisLike(songId, userId)) {
@@ -114,5 +134,27 @@ public class LikeServiceImpl implements LikeService {
         Long currentCount = stringRedisTemplate.opsForValue().increment(key);
 
         return currentCount != null ? currentCount : 0L;
+    }
+
+    @Override
+    @Transactional
+    public PageResponse<SongResponse> getUserLikedSongs(String userId, Pageable pageable) {
+        // Verify user exists
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+
+        Page<SongFavorite> page = songFavoriteRepository.findByUserId(userId, pageable);
+        List<Song> songs = page.getContent().stream()
+                .map(SongFavorite::getSong)
+                .toList();
+
+        return PageResponse.<SongResponse>builder()
+                .content(songs.stream()
+                        .map(song -> songMapper.toSongResponse(song, true))
+                        .toList())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .build();
     }
 }

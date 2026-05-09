@@ -1,6 +1,8 @@
 package com.tunhan.micsu.service.like;
 
+import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
+import org.springframework.data.domain.Pageable;
 
 
 public interface LikeService {
@@ -17,4 +19,6 @@ public interface LikeService {
     void unlike(String songId, String userId);
 
     long incrementLikeCount(String songId);
+
+    PageResponse<SongResponse> getUserLikedSongs(String userId, Pageable pageable);
 }
