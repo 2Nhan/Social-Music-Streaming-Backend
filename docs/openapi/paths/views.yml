@@ -1,0 +1,34 @@
+# View endpoints from ViewController
+
+SongView:
+  patch:
+    tags: [Views]
+    summary: Increase song view count
+    description: Increase view count for a song and return the updated song.
+    operationId: increaseSongView
+    security: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song id.
+    responses:
+      "200":
+        description: Song view increased successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/response/SongResponse.yml"
+      "404":
+        description: Song not found.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"

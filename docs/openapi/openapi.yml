@@ -31,6 +31,8 @@ tags:
     description: Song comments (add, list, delete).
   - name: Likes
     description: Like songs.
+  - name: Views
+    description: Song view tracking.
   - name: Follow
     description: Follow/unfollow users.
   - name: Playlists
@@ -62,8 +64,6 @@ paths:
     $ref: "./paths/songs.yml#/SongById"
   /api/v1/songs/{songId}/stream/master.m3u8:
     $ref: "./paths/songs.yml#/StreamHls"
-  /api/v1/songs/{songId}/view:
-    $ref: "./paths/songs.yml#/SongView"
 
   # ── Search ────────────────────────────────────────────────
   /api/v1/search:
@@ -80,6 +80,8 @@ paths:
   # ── Likes ─────────────────────────────────────────────────
   /api/v1/likes/songs/{songId}:
     $ref: "./paths/likes.yml#/Like"
+  /api/v1/views/songs/{songId}:
+    $ref: "./paths/views.yml#/SongView"
 
   # ── Follow ────────────────────────────────────────────────
   /api/v1/follow/{userId}:
