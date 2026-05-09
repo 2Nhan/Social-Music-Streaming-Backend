@@ -19,6 +19,12 @@ properties:
   favoriteCount:
     type: integer
     format: int64
+  isFavorited:
+    type: boolean
+    nullable: true
+    description: >-
+      Whether the current authenticated user has favorited this song.
+      Null when request is anonymous.
   viewCount:
     type: integer
     format: int64

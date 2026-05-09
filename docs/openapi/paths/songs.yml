@@ -4,7 +4,10 @@ SongsCollection:
   get:
     tags: [Songs]
     summary: Get all songs
-    description: Retrieve a paginated list of songs.
+    description: >-
+      Retrieve a paginated list of songs.
+      This endpoint is public. If Authorization Bearer token is provided,
+      each item includes user-specific `isFavorited`; otherwise `isFavorited` is null.
     operationId: getAllSongs
     security: []
     parameters:
@@ -80,11 +83,56 @@ UploadSong:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
 
+UploadSongV2:
+  post:
+    tags: [Songs]
+    summary: Upload a song (v2 pipeline)
+    description: >-
+      Upload a song using the alternate processing pipeline.
+      Accepts the same multipart fields as `/api/v1/songs/upload`.
+    operationId: uploadSongV2
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: "../components/schemas/request/SongUploadRequest.yml"
+    responses:
+      "200":
+        description: Song uploaded successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
+      "400":
+        description: Validation failed.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+
 SongById:
   get:
     tags: [Songs]
     summary: Get song by id
-    description: Retrieve details for a specific song.
+    description: >-
+      Retrieve details for a specific song.
+      This endpoint is public. If Authorization Bearer token is provided,
+      `data.isFavorited` is computed for the current user; otherwise it is null.
     operationId: getSongById
     security: []
     parameters:

@@ -26,7 +26,10 @@ GenreSongs:
   get:
     tags: [Genres]
     summary: Get songs by genre
-    description: Retrieve paginated songs for a genre id.
+    description: >-
+      Retrieve paginated songs for a genre id.
+      This endpoint is public. If Authorization Bearer token is provided,
+      each item includes user-specific `isFavorited`; otherwise `isFavorited` is null.
     operationId: getSongsByGenre
     security: []
     parameters:

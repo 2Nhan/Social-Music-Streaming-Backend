@@ -87,7 +87,10 @@ UserSongs:
   get:
     tags: [Users]
     summary: Get songs uploaded by user
-    description: Retrieve songs uploaded by a user with pagination and sort.
+    description: >-
+      Retrieve songs uploaded by a user with pagination and sort.
+      This endpoint is public. If Authorization Bearer token is provided,
+      each song includes user-specific `isFavorited`; otherwise `isFavorited` is null.
     operationId: getUserSongs
     security: []
     parameters:

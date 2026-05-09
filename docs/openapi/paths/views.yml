@@ -4,7 +4,10 @@ SongView:
   patch:
     tags: [Views]
     summary: Increase song view count
-    description: Increase view count for a song and return the updated song.
+    description: >-
+      Increase view count for a song and return the updated song.
+      This endpoint is public. If Authorization Bearer token is provided,
+      `data.isFavorited` is computed for the current user; otherwise it is null.
     operationId: increaseSongView
     security: []
     parameters:

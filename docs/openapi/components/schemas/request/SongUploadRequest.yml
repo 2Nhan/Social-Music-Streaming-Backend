@@ -2,7 +2,7 @@ type: object
 required:
   - title
   - audioFile
-  - genreName
+  - gerne
 properties:
   title:
     type: string
@@ -19,7 +19,7 @@ properties:
     type: string
     format: binary
     description: Audio file (MP3).
-  genreName:
-    $ref: '../response/GenreName.yml'
+  gerne:
+    $ref: "../response/GenreName.yml"
   visibility:
-    $ref: '../response/Visibility.yml'
+    $ref: "../response/Visibility.yml"

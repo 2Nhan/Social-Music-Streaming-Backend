@@ -4,7 +4,10 @@ SearchResults:
   get:
     tags: [Search]
     summary: Search songs
-    description: Search songs by keyword with pagination.
+    description: >-
+      Search songs by keyword with pagination.
+      This endpoint is public. If Authorization Bearer token is provided,
+      each result includes user-specific `isFavorited`; otherwise `isFavorited` is null.
     operationId: searchResults
     security: []
     parameters:

@@ -4,7 +4,9 @@ Like:
   post:
     tags: [Likes]
     summary: Like a song
-    description: Like a song by id.
+    description: >-
+      Like a song by id using canonical endpoint.
+      Returns updated `SongResponse` with `isFavorited=true`.
     operationId: likeSong
     security:
       - BearerAuth: []
@@ -48,7 +50,9 @@ Like:
   delete:
     tags: [Likes]
     summary: Unlike a song
-    description: Remove the authenticated user's like from a song.
+    description: >-
+      Remove the authenticated user's like from a song using canonical endpoint.
+      Returns updated `SongResponse` with `isFavorited=false`.
     operationId: unlikeSong
     security:
       - BearerAuth: []
@@ -83,3 +87,92 @@ Like:
           application/json:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
+
+LikeAlias:
+  post:
+    tags: [Likes]
+    summary: Like a song (legacy alias)
+    description: Alias of `/api/v1/likes/songs/{songId}`.
+    operationId: likeSongAlias
+    deprecated: true
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song id.
+    responses:
+      "200":
+        description: Song liked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/response/SongResponse.yml"
+
+UnlikeAlias:
+  delete:
+    tags: [Likes]
+    summary: Unlike a song (legacy alias)
+    description: Alias of DELETE `/api/v1/likes/songs/{songId}`.
+    operationId: unlikeSongAlias
+    deprecated: true
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song id.
+    responses:
+      "200":
+        description: Song unliked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/response/SongResponse.yml"
+
+LikeV2:
+  post:
+    tags: [Likes]
+    summary: Like a song (v2)
+    description: >-
+      Like a song using v2 flow.
+      This endpoint returns `data = null` on success.
+    operationId: likeSongV2
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song id.
+    responses:
+      "200":
+        description: Song liked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      nullable: true
+                      example: null
