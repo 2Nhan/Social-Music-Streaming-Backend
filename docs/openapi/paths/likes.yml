@@ -1,4 +1,16 @@
 # Like endpoints from LikeController
+# ─────────────────────────────────────────────────────────────────────────────
+# Released in this version (DB-only flow, no Redis):
+#   POST   /api/v1/likes/songs/{songId}  → Like
+#   DELETE /api/v1/likes/songs/{songId}  → Unlike
+#   GET    /api/v1/likes/songs           → LikedSongs (authenticated user only)
+#
+# Intentionally NOT published in this release (Redis-based flows — preserved in
+# service layer for future use):
+#   POST   /api/v1/like/songs/{songId}    (LikeAlias  – Redis flow, deprecated)
+#   DELETE /api/v1/unlike/songs/{songId}  (UnlikeAlias – Redis flow, deprecated)
+#   POST   /api/v2/like/songs/{songId}    (LikeV2     – Redis flow)
+# ─────────────────────────────────────────────────────────────────────────────
 
 Like:
   post:
@@ -88,84 +100,35 @@ Like:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
 
-LikeAlias:
-  post:
+LikedSongs:
+  get:
     tags: [Likes]
-    summary: Like a song (legacy alias)
-    description: Alias of `/api/v1/likes/songs/{songId}`.
-    operationId: likeSongAlias
-    deprecated: true
-    security:
-      - BearerAuth: []
-    parameters:
-      - in: path
-        name: songId
-        required: true
-        schema:
-          type: string
-        description: Song id.
-    responses:
-      "200":
-        description: Song liked successfully.
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "../components/schemas/response/ApiResponse.yml"
-                - type: object
-                  properties:
-                    data:
-                      $ref: "../components/schemas/response/SongResponse.yml"
-
-UnlikeAlias:
-  delete:
-    tags: [Likes]
-    summary: Unlike a song (legacy alias)
-    description: Alias of DELETE `/api/v1/likes/songs/{songId}`.
-    operationId: unlikeSongAlias
-    deprecated: true
-    security:
-      - BearerAuth: []
-    parameters:
-      - in: path
-        name: songId
-        required: true
-        schema:
-          type: string
-        description: Song id.
-    responses:
-      "200":
-        description: Song unliked successfully.
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "../components/schemas/response/ApiResponse.yml"
-                - type: object
-                  properties:
-                    data:
-                      $ref: "../components/schemas/response/SongResponse.yml"
-
-LikeV2:
-  post:
-    tags: [Likes]
-    summary: Like a song (v2)
+    summary: Get liked songs of the current user
     description: >-
-      Like a song using v2 flow.
-      This endpoint returns `data = null` on success.
-    operationId: likeSongV2
+      Returns a paginated list of songs liked by the currently authenticated user.
+      The user identity is derived exclusively from the Bearer JWT token —
+      it is not possible to query another user's liked songs through this endpoint.
+    operationId: getUserLikedSongs
     security:
       - BearerAuth: []
     parameters:
-      - in: path
-        name: songId
-        required: true
+      - in: query
+        name: page
+        required: false
         schema:
-          type: string
-        description: Song id.
+          type: integer
+          default: 0
+        description: Zero-based page index.
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          default: 20
+        description: Number of items per page.
     responses:
       "200":
-        description: Song liked successfully.
+        description: Liked songs retrieved successfully.
         content:
           application/json:
             schema:
@@ -174,5 +137,10 @@ LikeV2:
                 - type: object
                   properties:
                     data:
-                      nullable: true
-                      example: null
+                      $ref: "../components/schemas/response/PageResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"

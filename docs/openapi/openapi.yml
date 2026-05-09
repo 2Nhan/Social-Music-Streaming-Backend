@@ -88,12 +88,8 @@ paths:
   # ── Likes ─────────────────────────────────────────────────
   /api/v1/likes/songs/{songId}:
     $ref: "./paths/likes.yml#/Like"
-  /api/v1/like/songs/{songId}:
-    $ref: "./paths/likes.yml#/LikeAlias"
-  /api/v1/unlike/songs/{songId}:
-    $ref: "./paths/likes.yml#/UnlikeAlias"
-  /api/v2/like/songs/{songId}:
-    $ref: "./paths/likes.yml#/LikeV2"
+  /api/v1/likes/songs:
+    $ref: "./paths/likes.yml#/LikedSongs"
   /api/v1/views/songs/{songId}:
     $ref: "./paths/views.yml#/SongView"
 
