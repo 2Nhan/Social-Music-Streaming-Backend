@@ -110,6 +110,10 @@ paths:
     $ref: "./paths/users.yml#/UserById"
   /api/v1/users/{id}/songs:
     $ref: "./paths/users.yml#/UserSongs"
+  /api/v1/users/{id}/playlists:
+    $ref: "./paths/users.yml#/UserPlaylists"
+  /api/v1/users/{id}/playlists/public:
+    $ref: "./paths/users.yml#/UserPublicPlaylists"
   /api/v1/users/{id}/followers:
     $ref: "./paths/users.yml#/UserFollowers"
   /api/v1/users/{id}/following:
@@ -118,6 +122,8 @@ paths:
     $ref: "./paths/users.yml#/UserReposts"
 
   # ── History / Me ──────────────────────────────────────────
+  /api/v1/users/me/playlists:
+    $ref: "./paths/users.yml#/MyPlaylists"
   /api/v1/users/me/history/{songId}:
     $ref: "./paths/history.yml#/LogListen"
   /api/v1/users/me/history:

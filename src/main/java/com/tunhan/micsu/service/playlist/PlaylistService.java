@@ -11,6 +11,8 @@ public interface PlaylistService {
 
     PageResponse<PlaylistResponse> getAllPlaylists(String userId, Pageable pageable);
 
+    PageResponse<PlaylistResponse> getPublicPlaylistsByUser(String userId, Pageable pageable);
+
     PlaylistResponse createPlaylist(PlaylistRequest request, String userId);
 
     PlaylistResponse updatePlaylist(String id, PlaylistRequest request, String userId);

@@ -45,6 +45,13 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PlaylistResponse> getPublicPlaylistsByUser(String userId, Pageable pageable) {
+        Page<Playlist> page = playlistRepository.findByCreatedByAndVisibility(userId, Visibility.PUBLIC, pageable);
+        return toPageResponse(page);
+    }
+
+    @Override
     public PlaylistResponse createPlaylist(PlaylistRequest request, String userId) {
         Playlist playlist = Playlist.builder()
                 .name(request.getName())

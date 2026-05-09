@@ -56,6 +56,7 @@ public class SecurityConfig {
                         "/api/v1/users/*/followers",
                         "/api/v1/users/*/following",
                         "/api/v1/users/*/reposts",
+                        "/api/v1/users/*/playlists/public",
                         "/api/v1/playlists/*",
                         // Swagger UI
                         "/swagger-ui.html",

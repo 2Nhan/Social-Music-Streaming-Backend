@@ -2,8 +2,10 @@ package com.tunhan.micsu.controller;
 
 import com.tunhan.micsu.dto.request.UpdateProfileRequest;
 import com.tunhan.micsu.dto.response.*;
+import com.tunhan.micsu.exception.AccessDeniedException;
 import com.tunhan.micsu.service.follow.FollowService;
 import com.tunhan.micsu.service.like.LikeService;
+import com.tunhan.micsu.service.playlist.PlaylistService;
 import com.tunhan.micsu.service.repost.RepostService;
 import com.tunhan.micsu.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class UserController {
     private final FollowService followService;
     private final LikeService likeService;
     private final RepostService repostService;
+    private final PlaylistService playlistService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getUserById(@PathVariable String id) {
@@ -49,6 +52,37 @@ public class UserController {
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
         return ResponseEntity.ok(ApiResponse.success(
                 userService.getUserSongs(id, buildPageable(page, size, sort))));
+    }
+
+    @GetMapping("/me/playlists")
+    public ResponseEntity<ApiResponse<PageResponse<PlaylistResponse>>> getMyPlaylists(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(ApiResponse.success(
+                playlistService.getAllPlaylists(jwt.getSubject(), PageRequest.of(page, size))));
+    }
+
+    @GetMapping("/{id}/playlists")
+    public ResponseEntity<ApiResponse<PageResponse<PlaylistResponse>>> getUserPlaylists(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal Jwt jwt) {
+        if (!id.equals(jwt.getSubject())) {
+            throw new AccessDeniedException("You can only view your own playlists");
+        }
+        return ResponseEntity.ok(ApiResponse.success(
+                playlistService.getAllPlaylists(id, PageRequest.of(page, size))));
+    }
+
+    @GetMapping("/{id}/playlists/public")
+    public ResponseEntity<ApiResponse<PageResponse<PlaylistResponse>>> getUserPublicPlaylists(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(ApiResponse.success(
+                playlistService.getPublicPlaylistsByUser(id, PageRequest.of(page, size))));
     }
 
     @GetMapping("/{id}/followers")

@@ -12,4 +12,6 @@ public interface PlaylistRepository extends JpaRepository<Playlist, String> {
     Page<Playlist> findByCreatedBy(String createdBy, Pageable pageable);
 
     Page<Playlist> findAllByVisibility(Visibility visibility, Pageable pageable);
+
+    Page<Playlist> findByCreatedByAndVisibility(String createdBy, Visibility visibility, Pageable pageable);
 }

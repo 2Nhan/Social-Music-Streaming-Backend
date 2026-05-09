@@ -141,6 +141,158 @@ UserSongs:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
 
+MyPlaylists:
+  get:
+    tags: [Users]
+    summary: Get authenticated user's playlists
+    description: Retrieve playlists created by the authenticated user.
+    operationId: getMyPlaylists
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
+        description: Number of items per page.
+    responses:
+      "200":
+        description: User playlists retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/PlaylistResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+
+UserPlaylists:
+  get:
+    tags: [Users]
+    summary: Get playlists created by user
+    description: Retrieve playlists created by the user. Only the owner can view this endpoint.
+    operationId: getUserPlaylists
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User id.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
+        description: Number of items per page.
+    responses:
+      "200":
+        description: User playlists retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/PlaylistResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "403":
+        description: Access denied.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+
+UserPublicPlaylists:
+  get:
+    tags: [Users]
+    summary: Get public playlists created by user
+    description: Retrieve public playlists created by a user.
+    operationId: getUserPublicPlaylists
+    security: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User id.
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+        description: Page number (0-indexed).
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
+        description: Number of items per page.
+    responses:
+      "200":
+        description: Public playlists retrieved successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      allOf:
+                        - $ref: "../components/schemas/response/PageResponse.yml"
+                        - type: object
+                          properties:
+                            content:
+                              type: array
+                              items:
+                                $ref: "../components/schemas/response/PlaylistResponse.yml"
+
 UserFollowers:
   get:
     tags: [Users]
