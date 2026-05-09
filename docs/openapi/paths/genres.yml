@@ -26,16 +26,17 @@ GenreSongs:
   get:
     tags: [Genres]
     summary: Get songs by genre
-    description: Retrieve paginated songs for a genre name.
+    description: Retrieve paginated songs for a genre id.
     operationId: getSongsByGenre
     security: []
     parameters:
       - in: path
-        name: genreName
+        name: genreId
         required: true
         schema:
-          $ref: "../components/schemas/response/GenreName.yml"
-        description: Genre name.
+          type: string
+          format: uuid
+        description: Genre id.
       - in: query
         name: page
         schema:

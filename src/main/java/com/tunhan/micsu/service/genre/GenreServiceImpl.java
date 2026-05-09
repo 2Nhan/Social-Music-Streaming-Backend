@@ -4,7 +4,6 @@ import com.tunhan.micsu.dto.response.GenreResponse;
 import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.entity.Genre;
-import com.tunhan.micsu.entity.enums.GenreName;
 import com.tunhan.micsu.exception.ResourceNotFoundException;
 import com.tunhan.micsu.mapper.GenreMapper;
 import com.tunhan.micsu.mapper.SongMapper;
@@ -38,10 +37,10 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<SongResponse> getSongsByGenre(GenreName genreName, Pageable pageable) {
-        Genre genre = genreRepository.findByName(genreName)
-                .orElseThrow(() -> new ResourceNotFoundException("Genre", genreName.name()));
-        var page = songRepository.findByGenreName(genre.getName(), pageable);
+    public PageResponse<SongResponse> getSongsByGenre(String genreId, Pageable pageable) {
+        Genre genre = genreRepository.findById(genreId)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre", genreId));
+        var page = songRepository.findByGenreId(genre.getId(), pageable);
         return PageResponse.<SongResponse>builder()
                 .content(page.getContent().stream().map(songMapper::toSongResponse).toList())
                 .page(page.getNumber())

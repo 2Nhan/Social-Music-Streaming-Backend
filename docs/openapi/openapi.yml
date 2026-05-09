@@ -68,7 +68,7 @@ paths:
     $ref: "./paths/songs.yml#/StreamHls"
   /api/v1/genres:
     $ref: "./paths/genres.yml#/GenresCollection"
-  /api/v1/genres/{genreName}/songs:
+  /api/v1/genres/{genreId}/songs:
     $ref: "./paths/genres.yml#/GenreSongs"
 
   # ── Search ────────────────────────────────────────────────

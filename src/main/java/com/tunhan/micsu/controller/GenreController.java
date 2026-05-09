@@ -4,7 +4,6 @@ import com.tunhan.micsu.dto.response.ApiResponse;
 import com.tunhan.micsu.dto.response.GenreResponse;
 import com.tunhan.micsu.dto.response.PageResponse;
 import com.tunhan.micsu.dto.response.SongResponse;
-import com.tunhan.micsu.entity.enums.GenreName;
 import com.tunhan.micsu.service.genre.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,12 +24,12 @@ public class GenreController {
         return ResponseEntity.ok(ApiResponse.success(genreService.getAllGenres()));
     }
 
-    @GetMapping("/{genreName}/songs")
+    @GetMapping("/{genreId}/songs")
     public ResponseEntity<ApiResponse<PageResponse<SongResponse>>> getSongsByGenre(
-            @PathVariable GenreName genreName,
+            @PathVariable String genreId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(
-                genreService.getSongsByGenre(genreName, PageRequest.of(page, size))));
+                genreService.getSongsByGenre(genreId, PageRequest.of(page, size))));
     }
 }

@@ -1,7 +1,6 @@
 package com.tunhan.micsu.repository;
 
 import com.tunhan.micsu.entity.Song;
-import com.tunhan.micsu.entity.enums.GenreName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +14,7 @@ import java.util.List;
 public interface SongRepository extends JpaRepository<Song, String> {
     Page<Song> findByUploadedBy(String uploadedBy, Pageable pageable);
 
-    @Query("SELECT s FROM Song s JOIN s.genre g WHERE g.name = :genreName")
-    Page<Song> findByGenreName(@Param("genreName") GenreName genreName, Pageable pageable);
+    Page<Song> findByGenreId(String genreId, Pageable pageable);
 
     @Modifying
     @Query("UPDATE Song s SET s.favoriteCount = s.favoriteCount + 1 WHERE s.id = :songId")
