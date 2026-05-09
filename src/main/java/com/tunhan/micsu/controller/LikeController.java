@@ -19,7 +19,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @PostMapping("/v1/like/songs/{songId}")
+    @PostMapping({"/v1/like/songs/{songId}", "/v1/likes/songs/{songId}"})
     public ResponseEntity<ApiResponse<SongResponse>> likeSong(
             @PathVariable String songId,
             @AuthenticationPrincipal Jwt jwt) {
@@ -38,11 +38,11 @@ public class LikeController {
         return ResponseEntity.ok(ApiResponse.success("Song liked successfully", null));
     }
 
-    @DeleteMapping("/v1/unlike/songs/{songId}")
-    public ResponseEntity<ApiResponse<Void>> unlikeSong(
+    @DeleteMapping({"/v1/unlike/songs/{songId}", "/v1/likes/songs/{songId}"})
+    public ResponseEntity<ApiResponse<SongResponse>> unlikeSong(
             @PathVariable String songId,
             @AuthenticationPrincipal Jwt jwt) {
-         likeService.unlike(songId, jwt.getSubject());
-        return ResponseEntity.ok(ApiResponse.success("Song unliked successfully", null));
+        SongResponse response = likeService.unlikeSong(songId, jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.success("Song unliked successfully", response));
     }
 }

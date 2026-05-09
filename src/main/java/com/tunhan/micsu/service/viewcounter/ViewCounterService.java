@@ -1,6 +1,7 @@
 package com.tunhan.micsu.service.viewcounter;
 
+import com.tunhan.micsu.dto.response.SongResponse;
 
 public interface ViewCounterService {
-    void increaseViewCount(String songId);
+    SongResponse increaseViewCount(String songId);
 }

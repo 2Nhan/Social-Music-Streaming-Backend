@@ -45,3 +45,41 @@ Like:
           application/json:
             schema:
               $ref: "../components/schemas/response/ErrorResponse.yml"
+  delete:
+    tags: [Likes]
+    summary: Unlike a song
+    description: Remove the authenticated user's like from a song.
+    operationId: unlikeSong
+    security:
+      - BearerAuth: []
+    parameters:
+      - in: path
+        name: songId
+        required: true
+        schema:
+          type: string
+        description: Song id.
+    responses:
+      "200":
+        description: Song unliked successfully.
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../components/schemas/response/ApiResponse.yml"
+                - type: object
+                  properties:
+                    data:
+                      $ref: "../components/schemas/response/SongResponse.yml"
+      "401":
+        description: Unauthenticated.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"
+      "404":
+        description: Song not found or song has not been liked by the authenticated user.
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas/response/ErrorResponse.yml"

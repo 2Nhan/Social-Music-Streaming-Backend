@@ -8,6 +8,8 @@ public interface LikeService {
 
     SongResponse likeSong(String songId, String userId);
 
+    SongResponse unlikeSong(String songId, String userId);
+
     void atomicUpdateLikeSong(String songId);
 
     void like(String songId, String userId);

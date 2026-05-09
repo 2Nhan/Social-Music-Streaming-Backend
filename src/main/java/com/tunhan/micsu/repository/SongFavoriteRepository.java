@@ -7,11 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SongFavoriteRepository extends JpaRepository<SongFavorite, String> {
 
     boolean existsByUserIdAndSongId(String userId, String songId);
+
+    Optional<SongFavorite> findByUserIdAndSongId(String userId, String songId);
     
     /**
      * Find all users who liked a specific song.

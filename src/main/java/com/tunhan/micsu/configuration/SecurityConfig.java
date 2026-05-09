@@ -68,7 +68,7 @@ public class SecurityConfig {
         };
 
         private static final String[] PUBLIC_PATCH = {
-                "/api/v1/songs/{songId}/view" // TODO: remove after testing
+                "/api/v1/songs/*/view" // TODO: remove after testing
         };
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

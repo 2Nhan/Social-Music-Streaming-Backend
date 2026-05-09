@@ -62,6 +62,8 @@ paths:
     $ref: "./paths/songs.yml#/SongById"
   /api/v1/songs/{songId}/stream/master.m3u8:
     $ref: "./paths/songs.yml#/StreamHls"
+  /api/v1/songs/{songId}/view:
+    $ref: "./paths/songs.yml#/SongView"
 
   # ── Search ────────────────────────────────────────────────
   /api/v1/search:

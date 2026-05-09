@@ -1,5 +1,7 @@
 package com.tunhan.micsu.controller;
 
+import com.tunhan.micsu.dto.response.ApiResponse;
+import com.tunhan.micsu.dto.response.SongResponse;
 import com.tunhan.micsu.service.song.SongService;
 import com.tunhan.micsu.service.viewcounter.ViewCounterService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +35,11 @@ public class HlsController {
     public ResponseEntity<Void> incrementViewCount(@PathVariable String songId) {
         viewCounterService.increaseViewCount(songId);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{songId}/view")
+    public ResponseEntity<ApiResponse<SongResponse>> increaseView(@PathVariable String songId) {
+        return ResponseEntity.ok(ApiResponse.success("Song view increased successfully",
+                viewCounterService.increaseViewCount(songId)));
     }
 }

@@ -29,11 +29,12 @@ public class LikeServiceImpl implements LikeService {
     @Override
     @Transactional
     public SongResponse likeSong(String songId, String userId) {
-        if(songFavoriteRepository.existsByUserIdAndSongId(userId, songId)) {
+        if (songFavoriteRepository.existsByUserIdAndSongId(userId, songId)) {
             throw new DuplicateResourceException("User has already liked this song");
         }
         User proxyUser = userRepository.getReferenceById(userId);
-        Song song = songRepository.findById(songId).orElseThrow(() -> new ResourceNotFoundException("Song not found with id: " + songId));
+        Song song = songRepository.findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("Song", songId));
 
         SongFavorite songFavorite = SongFavorite.builder()
                 .user(proxyUser)
@@ -43,6 +44,22 @@ public class LikeServiceImpl implements LikeService {
         songFavoriteRepository.save(songFavorite);
 
         songRepository.incrementFavoriteCount(songId);
+        song.setFavoriteCount((song.getFavoriteCount() != null ? song.getFavoriteCount() : 0L) + 1);
+
+        return songMapper.toSongResponse(song);
+    }
+
+    @Override
+    @Transactional
+    public SongResponse unlikeSong(String songId, String userId) {
+        Song song = songRepository.findById(songId)
+                .orElseThrow(() -> new ResourceNotFoundException("Song", songId));
+        SongFavorite favorite = songFavoriteRepository.findByUserIdAndSongId(userId, songId)
+                .orElseThrow(() -> new ResourceNotFoundException("User has not liked this song"));
+
+        songFavoriteRepository.delete(favorite);
+        songRepository.decrementFavoriteCount(songId);
+        song.setFavoriteCount(Math.max(0, (song.getFavoriteCount() != null ? song.getFavoriteCount() : 0L) - 1));
 
         return songMapper.toSongResponse(song);
     }
