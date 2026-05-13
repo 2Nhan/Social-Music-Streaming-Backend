@@ -87,4 +87,10 @@ public class TestController {
         likeService.incrementLikeCount(songId);
         return ResponseEntity.ok(ApiResponse.success("Concurrent like test completed", null));
     }
+
+    @PostMapping("/test/migrate/image")
+    public ResponseEntity<ApiResponse<Void>> testMigrateImage() {
+        r2StorageService.migrateAllImagesToWebp();
+        return ResponseEntity.ok(ApiResponse.success("Image migration test completed", null));
+    }
 }

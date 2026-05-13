@@ -3,9 +3,11 @@ package com.tunhan.micsu.service;
 import com.tunhan.micsu.utils.HlsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -15,6 +17,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -78,59 +81,66 @@ public class R2StorageService {
         return publicDomain + "/" + key;
     }
 
-    public CompletableFuture<String> uploadCoverAsync(MultipartFile file, String id) throws IOException {
-        this.checkImageInput(file);
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = ".jpg";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
-
-        String uniqueFileName = UUID.randomUUID().toString() + extension;
-        String key = "songs/" + id + "/" + coverAssets + "/" + uniqueFileName;
-
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(mBucket)
-                .key(key)
-                .contentType(file.getContentType())
-                .build();
-
-        byte[] fileBytes = file.getBytes();
-        AsyncRequestBody requestBody = AsyncRequestBody.fromBytes(fileBytes);
-
-        return s3AsyncClient.putObject(putObjectRequest, requestBody)
-                .handle((res, ex) -> {
-                    if (ex != null) {
-                        log.error("[R2StorageService] Cover upload failed: {}", ex.getMessage());
-                        throw new RuntimeException("Cover upload failed: " + ex.getMessage(), ex);
-                    }
-                    log.info("[R2StorageService] Cover uploaded successfully");
-                    return publicDomain + "/" + key;
-                });
-    }
-
     public String uploadAvatar(MultipartFile file, String userId) throws IOException {
         this.checkImageInput(file);
 
-        String originalFilename = file.getOriginalFilename();
-        String extension = ".jpg";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
+        // Tự động đổi đuôi thành .webp cho sạch sẽ, vì data bên trong là webp
+        String key = String.format("users/%s/avatars/%s.webp", userId, UUID.randomUUID());
 
-        String uniqueFileName = UUID.randomUUID().toString() + extension;
-        String key = "users/" + userId + "/avatars/" + uniqueFileName;
+        // Nén ảnh
+        byte[] optimizedBytes = processImageToWebp(file);
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        // Upload đồng bộ
+        s3Client.putObject(buildPutRequest(key, "image/webp"),
+                RequestBody.fromBytes(optimizedBytes));
+
+        log.info("[R2StorageService] Avatar uploaded and optimized: {}", key);
+        return publicDomain + "/" + key;
+    }
+
+    public CompletableFuture<String> uploadCoverAsync(MultipartFile file, String id) throws IOException {
+        this.checkImageInput(file);
+
+        String key = String.format("songs/%s/%s/%s.webp", id, coverAssets, UUID.randomUUID());
+
+        // Chạy việc nén và upload trong luồng Async
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return processImageToWebp(file);
+            } catch (IOException e) {
+                throw new RuntimeException("Image compression failed", e);
+            }
+        }).thenCompose(optimizedBytes -> {
+            AsyncRequestBody requestBody = AsyncRequestBody.fromBytes(optimizedBytes);
+
+            return s3AsyncClient.putObject(buildPutRequest(key, "image/webp"), requestBody)
+                    .thenApply(res -> {
+                        log.info("[R2StorageService] Cover uploaded and optimized async: {}", key);
+                        return publicDomain + "/" + key;
+                    });
+        }).exceptionally(ex -> {
+            log.error("[R2StorageService] Async cover upload failed: {}", ex.getMessage());
+            throw new RuntimeException("Upload failed", ex);
+        });
+    }
+
+    private byte[] processImageToWebp(MultipartFile file) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Thumbnails.of(file.getInputStream())
+                .scale(1.0) // Giữ nguyên kích cỡ
+                .outputFormat("webp")
+                .outputQuality(0.75) // Nén chất lượng 75%
+                .toOutputStream(outputStream);
+        return outputStream.toByteArray();
+    }
+
+    private PutObjectRequest buildPutRequest(String key, String contentType) {
+        return PutObjectRequest.builder()
                 .bucket(mBucket)
                 .key(key)
-                .contentType(file.getContentType())
+                .contentType(contentType)
+                .cacheControl("public, max-age=31536000") // Tối ưu cho CDN
                 .build();
-
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-        log.info("[R2StorageService] Avatar uploaded successfully: {}", key);
-        return publicDomain + "/" + key;
     }
 
     private void checkImageInput(MultipartFile file) {
@@ -139,10 +149,11 @@ public class R2StorageService {
         }
         List<String> allowedExtensions = List.of("image/jpeg",
                 "image/png",
-                "image/gif");
+                "image/gif",
+                "image/webp");
         if (!allowedExtensions.contains(file.getContentType())) {
             throw new IllegalArgumentException(
-                    "Unsupported image format. Please upload .jpeg, .png, or .gif file.");
+                    "Unsupported image format. Please upload .jpeg, .png, .webp or .gif file.");
         }
     }
 
@@ -310,5 +321,86 @@ public class R2StorageService {
             log.error("[R2StorageService] Cannot clean up old files (directory: {}). Error details: {}", prefix,
                     e.getMessage());
         }
+    }
+
+    private final List<String> TARGET_IMAGE_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".JPG", ".PNG");
+
+    /**
+     * Chạy tiến trình tối ưu hóa toàn bộ ảnh hiện có trên R2.
+     */
+    public void migrateAllImagesToWebp() {
+        log.info("[R2StorageService] Starting global image optimization migration...");
+
+        // Bạn có thể chỉ định các prefix cần quét để tránh quét nhầm các folder khác
+        List<String> prefixes = List.of("genre-officcial/jpop.png");
+
+        for (String prefix : prefixes) {
+            log.info("[R2StorageService] Scanning prefix: {}", prefix);
+
+            ListObjectsV2Request listReq = ListObjectsV2Request.builder()
+                    .bucket(mBucket)
+                    .prefix(prefix)
+                    .build();
+
+            // Sử dụng Paginator để xử lý hàng triệu file mà không gây tràn RAM
+            s3Client.listObjectsV2Paginator(listReq).contents().stream()
+                    .filter(obj -> isImageFile(obj.key()))
+                    .forEach(obj -> {
+                        try {
+                            this.optimizeAndOverwrite(obj.key());
+                        } catch (Exception e) {
+                            log.error("[R2StorageService] Failed to optimize {}: {}", obj.key(), e.getMessage());
+                        }
+                    });
+        }
+        log.info("[R2StorageService] Migration completed!");
+    }
+
+    private boolean isImageFile(String key) {
+        return TARGET_IMAGE_EXTENSIONS.stream().anyMatch(key::endsWith);
+    }
+
+    private void optimizeAndOverwrite(String key) throws IOException {
+        // 1. Kiểm tra Content-Type hiện tại
+        HeadObjectRequest headReq = HeadObjectRequest.builder().bucket(mBucket).key(key).build();
+        HeadObjectResponse headRes = s3Client.headObject(headReq);
+
+        if ("image/webp".equals(headRes.contentType())) {
+            log.debug("[R2StorageService] Skipping already optimized file: {}", key);
+            return;
+        }
+
+        log.info("[R2StorageService] Optimizing: {} (Size: {} KB)", key, headRes.contentLength() / 1024);
+
+        // 2. Download ảnh về Memory
+        GetObjectRequest getReq = GetObjectRequest.builder().bucket(mBucket).key(key).build();
+        ResponseInputStream<GetObjectResponse> s3Stream = s3Client.getObject(getReq);
+
+        // 3. Xử lý nén và chuyển đổi sang WebP bằng Thumbnailator
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+
+        // scale(1.0) giữ nguyên kích thước, outputQuality(0.75) nén dung lượng
+        Thumbnails.of(s3Stream)
+                .scale(1.0)
+                .outputFormat("webp")
+                .outputQuality(0.75)
+                .toOutputStream(outputStream);
+
+        byte[] optimizedData = outputStream.toByteArray();
+
+        // 4. Ghi đè lên chính Key cũ (Giữ nguyên đường dẫn)
+        PutObjectRequest putReq = PutObjectRequest.builder()
+                .bucket(mBucket)
+                .key(key)
+                .contentType("image/webp") // Ép kiểu WebP để trình duyệt hiểu
+                .cacheControl("public, max-age=31536000") // Cache 1 năm cho Client
+                .build();
+
+        s3Client.putObject(putReq, RequestBody.fromBytes(optimizedData));
+
+        log.info("[R2StorageService] Overwritten success: {} (New Size: {} KB)", key, optimizedData.length / 1024);
+
+        s3Stream.close();
+        outputStream.close();
     }
 }
